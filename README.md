@@ -1,3 +1,3 @@
 # CS32_game
 
-shinda@ucsb.edu
+TA email: shinda@ucsb.edu
