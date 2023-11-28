@@ -20,5 +20,5 @@ int main(int argc, char** argv) {
     glutCreateWindow("Hello");
     glutDisplayFunc(displayMe);
     glutMainLoop();
-    return 0;
+    return 0;   
 }
