@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-add_compile_options(-g -std=c++17 -Wall -Wextra -Werror)
+add_compile_options(-g -std=c++17 -Wall -Wextra -Werror -Wunused-variable -W)
 project(game VERSION 1.0)
 
 find_package(OpenGL REQUIRED)
