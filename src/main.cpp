@@ -1,31 +1,16 @@
 #include <iostream>
 #include <GL/glut.h>
+#include <Draw.h>
 
 // Makes a square move accross the screen forever
-
-struct Point {
-    double x;
-    double y;
-};
-
 
 Point p = {-.5, 0};
 
 // you can change these to make it faster or bigger
-double size = .1;
-double velocity = .02;
+double size = .15;
+double velocity = .01;
 
-void drawSquare(double size, Point p) {
-    glBegin(GL_POLYGON); // sets state to polygon drawing
 
-        // draws square with given size, centered at point p
-        glVertex3f(p.x - (size/2), p.y + (size/2), 0.0);  // set top left       
-        glVertex3f(p.x + (size/2), p.y + (size/2), 0.0);  // set top right      
-        glVertex3f(p.x + (size/2), p.y - (size/2), 0.0);  // set bottom right   
-        glVertex3f(p.x - (size/2), p.y - (size/2), 0.0);  // set bottom left    
-    
-    glEnd(); // ends the drwaing process and 
-}
 
 void update(int value) {
     static_cast<void>(value);
@@ -40,7 +25,7 @@ void update(int value) {
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT); // clears the canvas
-    drawSquare(size, p); // draws a square on the canvas at the point
+    drawRect(.1, .4, p); // draws a square on the canvas at the point
     glutSwapBuffers();  // swaps the canvas with the current screen
 }
 
