@@ -1,38 +1,29 @@
 #include <iostream>
 #include <GL/glut.h>
+#include <Draw.h>
+#include "Controller.h"
 
 // Makes a square move accross the screen forever
-
-struct Point {
-    double x;
-    double y;
-};
-
-
-Point p = {-.5, 0};
+Controller controller;
+Point p = {0, 0};
 
 // you can change these to make it faster or bigger
-double size = .1;
-double velocity = .02;
+double size = .06;
+const double max_vel = .015;
 
-void drawSquare(double size, Point p) {
-    glBegin(GL_POLYGON); // sets state to polygon drawing
+double x_vel = 0;
+double y_vel = 0;
 
-        // draws square with given size, centered at point p
-        glVertex3f(p.x - (size/2), p.y + (size/2), 0.0);  // set top left       
-        glVertex3f(p.x + (size/2), p.y + (size/2), 0.0);  // set top right      
-        glVertex3f(p.x + (size/2), p.y - (size/2), 0.0);  // set bottom right   
-        glVertex3f(p.x - (size/2), p.y - (size/2), 0.0);  // set bottom left    
-    
-    glEnd(); // ends the drwaing process and 
-}
+
+
 
 void update(int value) {
     static_cast<void>(value);
-    p.x += velocity;
-    if(p.x >= 1+size/2) {
-        p.x = -1-size/2;
-    }
+    controller.update();
+    x_vel = max_vel*controller.getX();
+    y_vel = max_vel*controller.getY();
+    p.x += x_vel;
+    p.y += y_vel;
     
     glutPostRedisplay(); // calls the display function
     glutTimerFunc(16, update, 0); // calls the update function again after 16 milliseconds (60FPS)
@@ -42,6 +33,18 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT); // clears the canvas
     drawSquare(size, p); // draws a square on the canvas at the point
     glutSwapBuffers();  // swaps the canvas with the current screen
+}
+
+void handleKeyPress(unsigned char key, int x, int y) {
+    static_cast<void>(x);
+    static_cast<void>(y);
+    controller.setKey(key, true);
+}
+
+void handleKeyReleased(unsigned char key, int x, int y) {
+    static_cast<void>(x);
+    static_cast<void>(y);
+    controller.setKey(key, false);
 }
 
 int main(int argc, char** argv) {
@@ -56,7 +59,10 @@ int main(int argc, char** argv) {
     // Game Loop:
     glutDisplayFunc(display); // function that paints everything on the screen
     glutTimerFunc(25, update, 0); // function that should do all the logic for entities
-    //    these two should be realy simple
+    glutKeyboardFunc(handleKeyPress);
+    glutKeyboardUpFunc(handleKeyReleased);
+    
+    // these two should be realy simple
 
     glutMainLoop(); //runs the function.
     return 0;   

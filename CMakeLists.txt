@@ -9,5 +9,12 @@ project(game VERSION 1.0)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
-add_executable(main main.cpp)
+set(Draw "src/lib/Draw.h")
+set(Point "src/lib/Point.h")
+set(Game "src/lib/Game.h" "src/lib/Game.cpp")
+
+include_directories(include)
+
+add_executable(main src/main.cpp ${Draw} ${Point} ${Game})
+target_include_directories(main PUBLIC src/lib/)
 target_link_libraries(main PRIVATE OpenGL::GL GLUT::GLUT)
