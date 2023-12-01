@@ -6,6 +6,9 @@
 #include "Draw.h"
 #include "Entity.h"
 #include "Controller.h"
+#include <memory>
+
+using namespace std;
 
 //Global Constants
 size_t const WINDOW_DIM_1 = 1400;
@@ -13,9 +16,8 @@ size_t const WINDOW_DIM_2 = 1400;
 
 
 // Instansiate needed classes
-Controller controller;
-Player player(0.12, 0.015); //see constructor for instantitaion details
-std::vector<Npc> npc_vec;
+Player player = Player(0, 0); //see constructor for instantitaion details
+vector<std::shared_ptr<Entity>> entities;
 
 
 //Random Number generation
@@ -25,10 +27,9 @@ auto gen = std::default_random_engine(rd()); //distribution(gen) will generate a
 
 void update(int value) {
     static_cast<void>(value);
-    controller.update();
-    player.update(controller.getX(), controller.getY());
-    for(size_t i = 0; i < npc_vec.size(); ++i){ //updates the npc position
-        npc_vec.at(i).update(distribution(gen), distribution(gen));
+    player.update();
+    for(shared_ptr<Entity> entity : entities) { 
+        entity->update();
     }
     
     glutPostRedisplay();          // calls the display function
@@ -37,9 +38,8 @@ void update(int value) {
 
 void spawnNpcs(size_t num_to_generate) {
     while(num_to_generate != 0){
-        Npc npc = Npc(0.06, 0.015, distribution(gen), distribution(gen)); 
-        npc.draw();
-        npc_vec.push_back(npc);
+        shared_ptr<Npc> npc =  make_shared<Npc>(0.06, 0.015); 
+        entities.push_back(npc);
         num_to_generate -= 1;
     }
 }
@@ -47,8 +47,8 @@ void spawnNpcs(size_t num_to_generate) {
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);                // clears the canvas
     player.draw();                               // draws a square on the canvas at the point
-    for(size_t i = 0; i < npc_vec.size(); ++i){  //draws the npcs
-        npc_vec.at(i).draw();
+    for(shared_ptr<Entity> entity : entities){  //draws the npcs
+        entity->draw();
     }
     glutSwapBuffers();  // swaps the canvas with the current screen
 }
@@ -56,13 +56,13 @@ void display() {
 void handleKeyPress(unsigned char key, int x, int y) {
     static_cast<void>(x);
     static_cast<void>(y);
-    controller.setKey(key, true);
+    player.controller.setKey(key, true);
 }
 
 void handleKeyReleased(unsigned char key, int x, int y) {
     static_cast<void>(x);
     static_cast<void>(y);
-    controller.setKey(key, false);
+    player.controller.setKey(key, false);
 }
 
 int main(int argc, char** argv) {
