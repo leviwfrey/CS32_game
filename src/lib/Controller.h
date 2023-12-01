@@ -86,12 +86,22 @@ class Controller {
             keyStates[key] = pressed;
         }
 
+        void setMousePos(Vector2d pos) {
+            mousePos = pos;
+        }
+
+        Vector2d getMousePos() const {
+            return mousePos;
+        }
+
     private:
         bool keyStates[256];
         double fix_x_dir = 0;
         double fix_y_dir = 0;
         double x_dir = 0;
         double y_dir = 0;
+
+        Vector2d mousePos = Vector2d(0, 0);
 };
 
 #endif

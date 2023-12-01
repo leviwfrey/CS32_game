@@ -29,7 +29,9 @@ void drawRect(double width, double height, Vector2d p) {
     glEnd();
 }
 
-void drawPoly(Vector2d center, vector<Vector2d> points, double angle) {
+//Not sure why but only draw convex shapes with this, with other shapes it fills in wierd gaps
+void drawPoly(Vector2d center, vector<Vector2d> points, double angle, double R=1.0, double G=1.0, double B=1.0, double A=1) {
+    glColor4f(R,G,B,A);
     glBegin(GL_POLYGON);
         for(Vector2d p : points) {
             p = p.rotate(angle);

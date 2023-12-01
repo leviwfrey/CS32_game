@@ -29,11 +29,12 @@ class Player: public Entity {
         }
 
         void draw() override {
-            drawPoly(pos, points, rot);
+            drawPoly(pos, body, rot, .392, .541, .169);
+            drawPoly(pos, muzzle, rot);
         }
 
         void update() {
-            rot += .1;
+            rot = pos.angleTo(controller.getMousePos());
             controller.update();
             vel.x = max_vel*controller.getXdir();
             vel.y = max_vel*controller.getYdir();
@@ -42,15 +43,23 @@ class Player: public Entity {
         }
 
         Controller controller;   
-        double max_vel = .03;
+        double max_vel = 10;
 
-        double size = .12;
+        double size = 100;
 
         Vector2d p1 = Vector2d(-size/2, size/2);
         Vector2d p2 = Vector2d(size/2, size/2);
-        Vector2d p3 = Vector2d(size/2, -size/2);
-        Vector2d p4 = Vector2d(-size/2, -size/2);
-        vector<Vector2d> points = {p1,p2,p3,p4};
+
+        Vector2d p3 = Vector2d(size/2, size/5);
+        Vector2d p4 = Vector2d(size/2+size*.4, size/5);
+        Vector2d p5 = Vector2d(size/2+size*.4, -size/5);
+        Vector2d p6 = Vector2d(size/2, -size/5);
+
+        Vector2d p7 = Vector2d(size/2, -size/2);
+        Vector2d p8 = Vector2d(-size/2, -size/2);
+
+        vector<Vector2d> body = {p1,p2,p7,p8};
+        vector<Vector2d> muzzle = {p3, p4, p5, p6};
 
 };
 
