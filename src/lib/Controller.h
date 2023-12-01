@@ -72,6 +72,7 @@ class Controller {
                     y_dir = y_dir * (1/fabs(y_dir));
                 }
            }
+
         }
     
         double getY() {
