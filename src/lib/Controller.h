@@ -74,11 +74,11 @@ class Controller {
            }
         }
     
-        double getY() {
+        double getYdir() {
             return y_dir;
         }
 
-        double getX() {
+        double getXdir() {
             return x_dir;
         }
 
