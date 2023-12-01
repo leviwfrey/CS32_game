@@ -75,7 +75,6 @@ int main(int argc, char** argv) {
     glutCreateWindow("Funny little square!!"); 
 
     // Game Loop:
-    spawnNpcs(5);
     glutDisplayFunc(display); // function that paints everything on the screen
     glutTimerFunc(25, update, 0); // function that should do all the logic for entities
     glutKeyboardFunc(handleKeyPress);
