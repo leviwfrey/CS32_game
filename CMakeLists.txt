@@ -10,7 +10,6 @@ find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
 set(Draw "src/lib/Draw.h")
-set(Point "src/lib/Point.h")
 
 include_directories(include)
 
