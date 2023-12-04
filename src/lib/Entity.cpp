@@ -56,6 +56,7 @@ Npc::Npc(Vector2d position, double size) {
     this->size = size;
     this->collider = Collider(40);
     this->rot = 0;
+    this->group = "Enemies";
 }
 
 void Npc::draw() {
