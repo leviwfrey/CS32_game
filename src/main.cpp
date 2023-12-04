@@ -18,6 +18,7 @@ int const SCREEN_HEIGHT = 1400;
 shared_ptr<EntityHandler> entityHandler = make_shared<EntityHandler>();
 shared_ptr<Player> player = make_shared<Player>(entityHandler); // Our games only Player object
 
+
 void update(int value) {
     static_cast<void>(value);
     entityHandler->updateAll();
@@ -79,7 +80,16 @@ int main(int argc, char** argv) {
     // these two should be realy simple
 
     entityHandler->addGroup("Players");
+    entityHandler->addGroup("Projectiles");
+    entityHandler->addGroup("Enemies");
+
+    entityHandler->addCollision("Players", "Enemies");
+    entityHandler->addCollision("Enemies", "Projectiles");
+
     entityHandler->addEntity(player, "Players");
+
+    shared_ptr<Npc> enemy = make_shared<Npc>(Vector2d(-300, 300), 40);
+    entityHandler->addEntity(enemy, "Enemies");
 
 
     glutMainLoop(); //runs the function.
