@@ -2,10 +2,9 @@
 #include <GL/glut.h>
 #include <random>
 #include <vector>
-
-#include "Draw.h"
 #include "Entity.h"
 #include "Controller.h"
+#include "EntityHandler.h"
 #include <memory>
 
 using namespace std;
@@ -16,54 +15,40 @@ int const SCREEN_HEIGHT = 1400;
 
 
 // Instansiate needed classes
-Player player = Player(0, 0); // Our games only Player object
-vector<std::shared_ptr<Entity>> entities; // list of all Entities
+shared_ptr<EntityHandler> entityHandler = make_shared<EntityHandler>();
+shared_ptr<Player> player = make_shared<Player>(entityHandler); // Our games only Player object
 
 void update(int value) {
     static_cast<void>(value);
-    player.update(); // updates the player
-    for(shared_ptr<Entity> entity : entities) { // updates every Entity
-        entity->update();
-    }
+    entityHandler->updateAll();
     
     glutPostRedisplay();          // calls the display function
     glutTimerFunc(16, update, 0); // calls the update function again after 16 milliseconds (60FPS)
 }
 
-void spawnNpcs(size_t num_to_generate) {
-    while(num_to_generate != 0){
-        shared_ptr<Npc> npc =  make_shared<Npc>(0.06, 0.015); 
-        entities.push_back(npc);
-        num_to_generate -= 1;
-    }
-}
-
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);                // clears the canvas
-    player.draw();                               // Draws Player
-    for(shared_ptr<Entity> entity : entities){  // Draw all other Entities
-        entity->draw();
-    }
+    entityHandler->drawAll();
     glutSwapBuffers();  // swaps the canvas with the current screen
 }
 
 void handleKeyPress(unsigned char key, int x, int y) {
     static_cast<void>(x);
     static_cast<void>(y);
-    player.controller.setKey(key, true); // feeds the controller keys pressed
+    player->controller.setKey(key, true); // feeds the controller keys pressed
 }
 
 void handleKeyReleased(unsigned char key, int x, int y) {
     static_cast<void>(x);
     static_cast<void>(y);
-    player.controller.setKey(key, false); // feeds the controller keys unpressed
+    player->controller.setKey(key, false); // feeds the controller keys unpressed
 }
 
 void mouseMotion(int x, int y) {
     Vector2d mousePos;
     mousePos.x = x - (SCREEN_WIDTH / 2);
     mousePos.y = (SCREEN_HEIGHT / 2) - y;
-    player.controller.setMousePos(mousePos); // feeds controller the position of the mouse on the screen
+    player->controller.setMousePos(mousePos); // feeds controller the position of the mouse on the screen
 }
 
 void reshape(int width, int height) {
@@ -92,6 +77,10 @@ int main(int argc, char** argv) {
     glutPassiveMotionFunc(mouseMotion);
     glutReshapeFunc(reshape);
     // these two should be realy simple
+
+    entityHandler->addGroup("Players");
+    entityHandler->addEntity(player, "Players");
+
 
     glutMainLoop(); //runs the function.
     return 0;   
