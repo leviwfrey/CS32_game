@@ -40,7 +40,7 @@ class Entity {
         double rot = 0;
         Collider collider = Collider(0);
         string group = "all";
-        bool isAlive;
+        bool isAlive = true;
 };
 
 class Player: public Entity {

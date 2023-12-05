@@ -29,7 +29,6 @@ Player::Player(shared_ptr<EntityHandler> entityHandler, Vector2d position, doubl
     this->group = "Players";
     this->collider = Collider(size/2, pos);
     this->entityHandler = entityHandler;
-    this->isAlive = true;
 
     this->size = size;
     // Model for player
@@ -64,6 +63,7 @@ void Player::update() {
     collider.setPosition(pos);
 
     if(controller.spaceTriggered()) {
+        cout << "ran" << endl;
         Vector2d rotatedPos = projSpawnPoint.rotate(rot);
         Vector2d newPos = pos.add(rotatedPos);
         shared_ptr<Projectile> projectile = make_shared<Projectile>(newPos, rot);    
@@ -91,7 +91,6 @@ Npc::Npc(Vector2d position, double size, shared_ptr<Player> _player) {
     p4 = Vector2d(-size/2, -size/2);
     body = {p1,p2,p3,p4};
     player = _player;
-    this->isAlive = true;
 }
 
 void Npc::draw() {
