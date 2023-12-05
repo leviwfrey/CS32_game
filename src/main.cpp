@@ -104,7 +104,9 @@ int main(int argc, char** argv) {
 
     entityHandler->addEntity(player, "Players");
 
+
     shared_ptr<Npc> enemy = make_shared<Npc>(Vector2d(-300, 300), 40, player);
+
     entityHandler->addEntity(enemy, "Enemies");
 
 

@@ -46,7 +46,7 @@ class Entity {
 class Player: public Entity {
 
     public:
-        Player(shared_ptr<EntityHandler> entityHandler, Vector2d position = Vector2d(0, 0));
+        Player(shared_ptr<EntityHandler> entityHandler, Vector2d position = Vector2d(0, 0), double size = 50);
 
         void draw();
         void update();
@@ -54,25 +54,14 @@ class Player: public Entity {
 
         Controller controller;   
 
-        double size = 50;
-
-        // Model for player
-        Vector2d p1 = Vector2d(-size/2, size/2);
-        Vector2d p2 = Vector2d(size/2, size/2);
-
-        Vector2d p3 = Vector2d(size/2, size/5);
-        Vector2d p4 = Vector2d(size/2+size*.4, size/5);
-        Vector2d p5 = Vector2d(size/2+size*.4, -size/5);
-        Vector2d p6 = Vector2d(size/2, -size/5);
-
-        Vector2d p7 = Vector2d(size/2, -size/2);
-        Vector2d p8 = Vector2d(-size/2, -size/2);
-
-        vector<Vector2d> body = {p1,p2,p7,p8};
-        vector<Vector2d> muzzle = {p3, p4, p5, p6};
+        
 
     private:
-        double speed = 10;
+        vector<Vector2d> body;
+        vector<Vector2d> muzzle; 
+        Vector2d projSpawnPoint = Vector2d(0, 0);
+        double size;
+        double speed = 8;
         shared_ptr<EntityHandler> entityHandler;
         
 };
@@ -93,10 +82,27 @@ class Npc: public Entity {
         Vector2d p4 = Vector2d(-size/2, -size/2);
 
         vector<Vector2d> body = {p1,p2,p3,p4};
+
         
     private:
         double speed = 5;
         shared_ptr<Player> player;
+
+};
+
+class Projectile : public Entity {
+    public:
+        Projectile(Vector2d position, double rot, double size = 26, string group = "Projectiles");
+
+        void draw();
+        void update();
+        void handleCollision(shared_ptr<Entity> entity);
+
+    private:
+        vector<Vector2d> model;
+        double size;
+        double speed = 20;
+
 };
 
 #endif
