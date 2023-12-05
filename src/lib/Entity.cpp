@@ -20,6 +20,14 @@ void Entity::setRotation(double rotation) {rot = rotation;}
 
 Collider Entity::getCollider() const { return collider; }
 
+void Entity::kill() {
+    isAlive = false;
+}
+
+void Entity::damage(int amount) {
+    healthBar.damage(amount);
+}
+
 
 // PLAYER
 Player::Player(shared_ptr<EntityHandler> entityHandler, Vector2d position, double size) {
@@ -58,20 +66,17 @@ void Player::draw() {
 void Player::update() {
     rot = controller.getMousePos().difference(pos).getAngle();
     controller.update();
-    timers.update();
+    weapon->update();
     vel.x = speed*controller.getXdir();
     vel.y = speed*controller.getYdir();
     pos.x += vel.x;
     pos.y += vel.y;
     collider.setPosition(pos);
 
-    if(canShoot && controller.spaceTriggered()) {
+    if(weapon->canShoot() && controller.spaceTriggered()) {
         Vector2d rotatedPos = projSpawnPoint.rotate(rot);
         Vector2d newPos = pos.add(rotatedPos);
-        shared_ptr<Projectile> projectile = make_shared<Projectile>(newPos, rot);    
-        entityHandler->addEntity(projectile, "Projectiles");
-        timers.addTimer(*this, &Player::resetCoolDown, weaponCooldown);
-        canShoot = false;
+        weapon->shoot(newPos, rot, entityHandler, "Projectiles");
     }
 
 }
@@ -80,9 +85,6 @@ void Player::handleCollision(shared_ptr<Entity> entity) {
     cout << getGroup() << " collided with " << entity->getGroup() << endl;
 }
 
-void Player::resetCoolDown() {
-    canShoot = true;
-}
 
 // NPC
 
@@ -100,6 +102,7 @@ Npc::Npc(Vector2d position, double size, shared_ptr<Player> _player) {
     body = {p1,p2,p3,p4};
     player = _player;
     healthBarPos = Vector2d(0, size * 1.4);
+    healthBar = HealthBar(size, hp);
 }
 
 void Npc::draw() {
@@ -117,45 +120,92 @@ void Npc::update() {
 }
 
 void Npc::handleCollision(shared_ptr<Entity> entity) {
-
-    cout << " collided with " << entity->getGroup() << "\n";
-    healthBar.damage(25);
+    static_cast<void>(entity);
     if(healthBar.empty()) {
-        isAlive = false;
+        kill();
     }
-
-    cout << getGroup() << " collided with " << entity->getGroup() << endl;
 }
+
+// Projectile Enemy
+
+SniperEnemy::SniperEnemy(Vector2d position, double size, shared_ptr<Player> player, shared_ptr<EntityHandler> entityHandler) {
+    this->pos = position;
+    this->size = size;
+    this->player = player;
+    this->collider = Collider(size * .707, pos);
+    healthBarPos = Vector2d(0, size * 1.4);
+    healthBar = HealthBar(size, hp);
+    this->group = "Enemies";
+    this->entityHandler = entityHandler;
+
+    Vector2d p1 = Vector2d(-size/2, size/2);
+    Vector2d p2 = Vector2d(size/2, size/2);
+    Vector2d p3 = Vector2d(size/2, -size/2);
+    Vector2d p4 = Vector2d(-size/2, -size/2);
+    model = {p1,p2,p3,p4};
+    firePoint = Vector2d(0,0);
+}
+
+void SniperEnemy::update() {
+    rot = player->getPosition().difference(pos).getAngle();
+    weapon->update();
+    if(player->getPosition().difference(pos).magnitude() <= range) {
+        if(weapon->canShoot()) {
+            Vector2d rotatedPos = firePoint.rotate(rot);
+            Vector2d newP = rotatedPos.add(pos);
+            weapon->shoot(newP, rot, entityHandler, "EnemyProjectiles");
+        }
+    } else {
+        vel = Vector2d(speed, 0).rotate(rot);
+        pos = pos.add(vel);
+        collider.setPosition(pos);
+    }
+}
+
+void SniperEnemy::draw() {
+    Vector2d::drawPoly(pos, model, rot);
+    healthBar.draw(pos.add(healthBarPos));
+}
+
+void SniperEnemy::handleCollision(shared_ptr<Entity> entity) {
+    static_cast<void>(entity);
+    if(healthBar.empty()) {
+        kill();
+    }
+}
+
 
 // Projectile
 
-Projectile::Projectile(Vector2d position, double rot, double size, string group) {
+Projectile::Projectile(vector<Vector2d>& model, Vector2d& position, double rotation, double size, double speed, double damage, string group, double R, double G, double B) {
+    this->model = model;
     this->pos = position;
-    this->rot = rot;
+    this->rot = rotation;
     this->collider = Collider(size/2, pos);
     this->group = group;
+    this->speed = speed;
+    this->damage = damage;
+    this->R = R;
+    this->G = G;
+    this->B = B;
     vel = Vector2d(speed, 0).rotate(rot);
-
-    Vector2d p1 = Vector2d(size/2, 0);
-    Vector2d p2 = Vector2d(-size/2, -size/2*.8);
-    Vector2d p3 = Vector2d(-size/2, size/2*.8);
-
-    model = {p1, p2, p3};
 }
 
 void Projectile::draw() {
-    Vector2d::drawPoly(pos, model, rot, 1, 0, 0);
+    Vector2d::drawPoly(pos, model, rot, R, G, B);
 }
 
 void Projectile::update() { 
-    pos.x += vel.x;
-    pos.y += vel.y;
+    pos = pos.add(vel);
     collider.setPosition(pos);
+    if(pos.x > 1000 || pos.x < -1000 || pos.y > 1000 || pos.y < -1000) {
+        kill();
+    }
 }
 
 void Projectile::handleCollision(shared_ptr<Entity> entity) {
-    cout << getGroup() << " collided with " << entity->getGroup() << endl;
-    isAlive = false;
+    entity->damage(damage);
+    kill();
 }
 
 //HealthBar
@@ -190,6 +240,34 @@ int HealthBar::max() const {
 }
 bool HealthBar::empty() const {
     return currentHP <= 0;
+}
+
+// Weapon
+
+void Shotgun::shoot(Vector2d& position, double& rot, shared_ptr<EntityHandler>& handler, string group) {
+    int numBullets = 20;
+    random_device rd;
+    for(int i = 0; i < numBullets; i++) {
+        mt19937 gen(rd());
+        normal_distribution<double> nd1(0.0, 1);
+        double rn1 = nd1(gen);
+
+        normal_distribution<double> nd2(1.0, .2);
+        double rn2 = nd2(gen);
+        cout << rn2 << endl;
+        
+        shared_ptr<Projectile> projectile = make_shared<Projectile>(model, position, rot + M_PI/15 * rn1, 13, fabs(speed * rn2), damage, group, 1.0, .05, .05);    
+        handler->addEntity(projectile, group);
+    }
+    timers.addTimer(*this, &Weapon::resetCooldown, cooldown);
+    ready = false;
+}
+
+void Sniper::shoot(Vector2d& position, double& rot, shared_ptr<EntityHandler>& handler, string group) {
+    shared_ptr<Projectile> projectile = make_shared<Projectile>(model, position, rot, size, speed, damage, group, 1, 0, .894);
+    handler->addEntity(projectile, group);
+    timers.addTimer(*this, &Weapon::resetCooldown, cooldown);
+    ready = false;
 }
 
 
