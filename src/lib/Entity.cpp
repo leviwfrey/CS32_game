@@ -45,6 +45,8 @@ Player::Player(shared_ptr<EntityHandler> entityHandler, Vector2d position, doubl
 
     body = {p1,p2,p7,p8};
     muzzle = {p3, p4, p5, p6};
+
+    projSpawnPoint = Vector2d(size, 0);
     
 }
 
@@ -56,24 +58,30 @@ void Player::draw() {
 void Player::update() {
     rot = controller.getMousePos().difference(pos).getAngle();
     controller.update();
+    timers.update();
     vel.x = speed*controller.getXdir();
     vel.y = speed*controller.getYdir();
     pos.x += vel.x;
     pos.y += vel.y;
     collider.setPosition(pos);
 
-    if(controller.spaceTriggered()) {
-        cout << "ran" << endl;
+    if(canShoot && controller.spaceTriggered()) {
         Vector2d rotatedPos = projSpawnPoint.rotate(rot);
         Vector2d newPos = pos.add(rotatedPos);
         shared_ptr<Projectile> projectile = make_shared<Projectile>(newPos, rot);    
         entityHandler->addEntity(projectile, "Projectiles");
+        timers.addTimer(*this, &Player::resetCoolDown, weaponCooldown);
+        canShoot = false;
     }
 
 }
 
 void Player::handleCollision(shared_ptr<Entity> entity) {
     cout << getGroup() << " collided with " << entity->getGroup() << endl;
+}
+
+void Player::resetCoolDown() {
+    canShoot = true;
 }
 
 // NPC
@@ -85,16 +93,18 @@ Npc::Npc(Vector2d position, double size, shared_ptr<Player> _player) {
     this->rot = 0;
     this->group = "Enemies";
 
-    p1 = Vector2d(-size/2, size/2);
-    p2 = Vector2d(size/2, size/2);
-    p3 = Vector2d(size/2, -size/2);
-    p4 = Vector2d(-size/2, -size/2);
+    Vector2d p1 = Vector2d(-size/2, size/2);
+    Vector2d p2 = Vector2d(size/2, size/2);
+    Vector2d p3 = Vector2d(size/2, -size/2);
+    Vector2d p4 = Vector2d(-size/2, -size/2);
     body = {p1,p2,p3,p4};
     player = _player;
+    healthBarPos = Vector2d(0, size * 1.4);
 }
 
 void Npc::draw() {
     Vector2d::drawPoly(pos, body, rot, .1, .2, .3);
+    healthBar.draw(pos.add(healthBarPos));
 }
 
 void Npc::update() {
@@ -109,7 +119,10 @@ void Npc::update() {
 void Npc::handleCollision(shared_ptr<Entity> entity) {
 
     cout << " collided with " << entity->getGroup() << "\n";
-    this->isAlive = false;
+    healthBar.damage(25);
+    if(healthBar.empty()) {
+        isAlive = false;
+    }
 
     cout << getGroup() << " collided with " << entity->getGroup() << endl;
 }
@@ -142,5 +155,43 @@ void Projectile::update() {
 
 void Projectile::handleCollision(shared_ptr<Entity> entity) {
     cout << getGroup() << " collided with " << entity->getGroup() << endl;
-
+    isAlive = false;
 }
+
+//HealthBar
+
+HealthBar::HealthBar(double width, int maxHP) {
+    this->width = width;
+    this->maxHP = maxHP;
+    currentHP = maxHP;
+}
+
+void HealthBar::damage(int amount) {
+    currentHP -= amount;
+}
+
+void HealthBar::draw(Vector2d position) const {
+    double healthRatio = static_cast<double>(currentHP) / static_cast<double>(maxHP);
+    if(healthRatio > 0) {
+        Vector2d p1 = Vector2d(-width/2 * healthRatio, 4);
+        Vector2d p2 = Vector2d(width/2 * healthRatio, 4);
+        Vector2d p3 = Vector2d(width/2 * healthRatio, -4);
+        Vector2d p4 = Vector2d(-width/2 * healthRatio, -4);
+        vector<Vector2d> points = {p1,p2,p3,p4};
+        Vector2d::drawPoly(position, points, 0, 0.569, 0.878, 0);
+    }
+}
+
+int HealthBar::current() const {
+    return currentHP;
+}
+int HealthBar::max() const {
+    return maxHP;
+}
+bool HealthBar::empty() const {
+    return currentHP <= 0;
+}
+
+
+
+

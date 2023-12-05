@@ -6,10 +6,27 @@
 #include <string>
 #include <memory>
 #include "Collider.h"
+#include "TimerHandler.h"
+#include <chrono>
 
 using namespace std;
 
 class EntityHandler;
+
+class HealthBar {
+    public:
+    HealthBar(double width, int maxHP);
+    void damage(int amount);
+    void draw(Vector2d position) const;
+    int current() const;
+    int max() const;
+    bool empty() const;
+
+    private:
+        double width;
+        int maxHP;
+        int currentHP;
+};
 
 class Entity { 
 
@@ -44,26 +61,35 @@ class Entity {
 };
 
 class Player: public Entity {
-
+    using PlayerTimerHandler = TimerHandler<Player>;
     public:
         Player(shared_ptr<EntityHandler> entityHandler, Vector2d position = Vector2d(0, 0), double size = 50);
 
         void draw();
         void update();
         void handleCollision(shared_ptr<Entity> entity);
+        void resetCoolDown();
 
         Controller controller;   
 
         
 
     private:
+
+        //model
         vector<Vector2d> body;
         vector<Vector2d> muzzle; 
         Vector2d projSpawnPoint = Vector2d(0, 0);
         double size;
-        double speed = 8;
+
+        //physics
+        double speed = 11;
+
+        //weapon
+        chrono::milliseconds weaponCooldown = chrono::milliseconds(250);
+        bool canShoot = true;
+        PlayerTimerHandler timers;
         shared_ptr<EntityHandler> entityHandler;
-        
 };
 
 class Npc: public Entity {
@@ -76,17 +102,16 @@ class Npc: public Entity {
         void handleCollision(shared_ptr<Entity> entity);
 
         double size = 40;
-        Vector2d p1 = Vector2d(-size/2, size/2);
-        Vector2d p2 = Vector2d(size/2, size/2);
-        Vector2d p3 = Vector2d(size/2, -size/2);
-        Vector2d p4 = Vector2d(-size/2, -size/2);
+        
 
-        vector<Vector2d> body = {p1,p2,p3,p4};
+        vector<Vector2d> body;
 
         
     private:
-        double speed = 5;
+        double speed = 3;
         shared_ptr<Player> player;
+        HealthBar healthBar = HealthBar(55, 100);
+        Vector2d healthBarPos;
 
 };
 
