@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include "EntityHandler.h"
 #include <iostream>
+#include <cmath>
 
 
 // ENTITY
@@ -45,6 +46,8 @@ Player::Player(shared_ptr<EntityHandler> entityHandler, Vector2d position, doubl
 
     body = {p1,p2,p7,p8};
     muzzle = {p3, p4, p5, p6};
+
+    projSpawnPoint = Vector2d(size, 0);
     
 }
 
@@ -65,6 +68,10 @@ void Player::update() {
         Vector2d rotatedPos = projSpawnPoint.rotate(rot);
         Vector2d newPos = pos.add(rotatedPos);
         shared_ptr<Projectile> projectile = make_shared<Projectile>(newPos, rot);    
+        entityHandler->addEntity(projectile, "Projectiles");
+        projectile = make_shared<Projectile>(newPos, rot-(M_PI/10));
+        entityHandler->addEntity(projectile, "Projectiles");
+        projectile = make_shared<Projectile>(newPos, rot+(M_PI/10));
         entityHandler->addEntity(projectile, "Projectiles");
     }
 }
