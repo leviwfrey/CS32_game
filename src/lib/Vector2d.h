@@ -53,6 +53,10 @@ class Vector2d {
             return Vector2d(x - other.x, y - other.y);
         }
 
+        Vector2d add(Vector2d& other) const {
+            return Vector2d(x + other.x, y + other.y);
+        }
+
         Vector2d normalized() const {
             if(x == 0 && y == 0) {
                 return Vector2d(0, 0);
@@ -76,7 +80,8 @@ class Vector2d {
                 glVertex3f(center.x + p.x, center.y + p.y, 0.0);
             }
             glEnd();
-}
+        }
+
 
 };
 

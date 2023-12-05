@@ -2,11 +2,24 @@
 #define CONTROLLER_H
 
 #include <cmath>
+#include <iostream>
+using namespace std;
 
 class Controller {
     public:
 
         void update() {
+            
+            if(keyStates[32]) {
+                if(!spaceDown && !spaceTrigger) {
+                    spaceTrigger = true;
+                } else {
+                    spaceTrigger = false;
+                }
+                spaceDown = true;
+            } else {
+                spaceDown = false;
+            }
 
             // detect SINGLE key down
             if(keyStates['d'] && !keyStates['a']) {
@@ -94,8 +107,16 @@ class Controller {
             return mousePos;
         }
 
+        bool spaceTriggered() const {
+            return spaceTrigger;
+        }
+
     private:
         bool keyStates[256];
+
+        bool spaceTrigger = false;
+        bool spaceDown = false;
+
         double fix_x_dir = 0;
         double fix_y_dir = 0;
         double x_dir = 0;

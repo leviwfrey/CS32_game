@@ -22,6 +22,7 @@ shared_ptr<Player> player = make_shared<Player>(entityHandler); // Our games onl
 void update(int value) {
     static_cast<void>(value);
     entityHandler->updateAll();
+    entityHandler->checkCollisions();
     
     glutPostRedisplay();          // calls the display function
     glutTimerFunc(16, update, 0); // calls the update function again after 16 milliseconds (60FPS)
@@ -88,7 +89,7 @@ int main(int argc, char** argv) {
 
     entityHandler->addEntity(player, "Players");
 
-    shared_ptr<Npc> enemy = make_shared<Npc>(Vector2d(-300, 300), 40);
+    shared_ptr<Npc> enemy = make_shared<Npc>();
     entityHandler->addEntity(enemy, "Enemies");
 
 
