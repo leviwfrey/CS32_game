@@ -32,6 +32,7 @@ class Entity {
         void setRotation(double rotation); 
 
         Collider getCollider() const;
+        bool alive(){return isAlive;}
 
     protected:
         Vector2d pos = Vector2d(0, 0);
@@ -39,6 +40,7 @@ class Entity {
         double rot = 0;
         Collider collider = Collider(0);
         string group = "all";
+        bool isAlive;
 };
 
 class Player: public Entity {
@@ -72,27 +74,29 @@ class Player: public Entity {
     private:
         double speed = 10;
         shared_ptr<EntityHandler> entityHandler;
+        
 };
 
 class Npc: public Entity {
 
     public:
-        Npc(Vector2d position = Vector2d(0, 0), double size = 50);
+        Npc(Vector2d position = Vector2d(0, 0), double size = 50, shared_ptr<Player> _player = nullptr);
 
         void draw();
         void update();
         void handleCollision(shared_ptr<Entity> entity);
 
-        double size;
+        double size = 40;
         Vector2d p1 = Vector2d(-size/2, size/2);
         Vector2d p2 = Vector2d(size/2, size/2);
         Vector2d p3 = Vector2d(size/2, -size/2);
         Vector2d p4 = Vector2d(-size/2, -size/2);
 
         vector<Vector2d> body = {p1,p2,p3,p4};
-
-
+        
     private:
+        double speed = 5;
+        shared_ptr<Player> player;
 };
 
 #endif
