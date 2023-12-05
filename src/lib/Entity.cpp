@@ -27,8 +27,9 @@ Player::Player(shared_ptr<EntityHandler> entityHandler, Vector2d position, doubl
     this->vel = Vector2d(0, 0);
     this->rot = controller.getMousePos().difference(pos).getAngle();
     this->group = "Players";
-    this->collider = Collider(50, pos);
+    this->collider = Collider(size/2, pos);
     this->entityHandler = entityHandler;
+    this->isAlive = true;
 
     this->size = size;
     // Model for player
@@ -61,12 +62,14 @@ void Player::update() {
     pos.x += vel.x;
     pos.y += vel.y;
     collider.setPosition(pos);
+
     if(controller.spaceTriggered()) {
         Vector2d rotatedPos = projSpawnPoint.rotate(rot);
         Vector2d newPos = pos.add(rotatedPos);
         shared_ptr<Projectile> projectile = make_shared<Projectile>(newPos, rot);    
         entityHandler->addEntity(projectile, "Projectiles");
     }
+
 }
 
 void Player::handleCollision(shared_ptr<Entity> entity) {
@@ -75,12 +78,20 @@ void Player::handleCollision(shared_ptr<Entity> entity) {
 
 // NPC
 
-Npc::Npc(Vector2d position, double size) {
+Npc::Npc(Vector2d position, double size, shared_ptr<Player> _player) {
     this->pos = position;
     this->size = size;
-    this->collider = Collider(40);
+    this->collider = Collider(size * 0.707, pos); //parameter sets the size of the hitbox
     this->rot = 0;
     this->group = "Enemies";
+
+    p1 = Vector2d(-size/2, size/2);
+    p2 = Vector2d(size/2, size/2);
+    p3 = Vector2d(size/2, -size/2);
+    p4 = Vector2d(-size/2, -size/2);
+    body = {p1,p2,p3,p4};
+    player = _player;
+    this->isAlive = true;
 }
 
 void Npc::draw() {
@@ -88,9 +99,19 @@ void Npc::draw() {
 }
 
 void Npc::update() {
+    Vector2d right = Vector2d(speed, 0); // this is a vector at 0 degrees
+    rot = player->getPosition().difference(pos).getAngle(); //gets angle from 0 degrees, equal to difference between player and npc
+    vel = right.rotate(rot);
+    pos.x += vel.x;
+    pos.y += vel.y;
+    collider.setPosition(pos);
 }
 
 void Npc::handleCollision(shared_ptr<Entity> entity) {
+
+    cout << " collided with " << entity->getGroup() << "\n";
+    this->isAlive = false;
+
     cout << getGroup() << " collided with " << entity->getGroup() << endl;
 }
 
@@ -122,4 +143,5 @@ void Projectile::update() {
 
 void Projectile::handleCollision(shared_ptr<Entity> entity) {
     cout << getGroup() << " collided with " << entity->getGroup() << endl;
+
 }

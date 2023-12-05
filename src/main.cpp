@@ -17,6 +17,7 @@ int const SCREEN_HEIGHT = 1400;
 // Instansiate needed classes
 shared_ptr<EntityHandler> entityHandler = make_shared<EntityHandler>();
 shared_ptr<Player> player = make_shared<Player>(entityHandler); // Our games only Player object
+size_t hp = 0;
 
 
 void update(int value) {
@@ -28,9 +29,23 @@ void update(int value) {
     glutTimerFunc(16, update, 0); // calls the update function again after 16 milliseconds (60FPS)
 }
 
+void drawText(double r, double g, double b, int xPos, int yPos, string text){
+    glColor3f(r,g,b);  // Set text color
+    glRasterPos2f(xPos, yPos);  // Set the starting position for the text
+    // Render each character in the string
+    for (char c: text) {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, c);
+    }
+}
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);                // clears the canvas
     entityHandler->drawAll();
+
+    
+    string text = "HP: " + std::to_string(hp);
+    drawText(1.0, 1.0, 1.0, 300, 300, text);
+    hp++;
     glutSwapBuffers();  // swaps the canvas with the current screen
 }
 
@@ -78,7 +93,7 @@ int main(int argc, char** argv) {
     glutKeyboardUpFunc(handleKeyReleased);
     glutPassiveMotionFunc(mouseMotion);
     glutReshapeFunc(reshape);
-    // these two should be realy simple
+    
 
     entityHandler->addGroup("Players");
     entityHandler->addGroup("Projectiles");
@@ -89,7 +104,9 @@ int main(int argc, char** argv) {
 
     entityHandler->addEntity(player, "Players");
 
-    shared_ptr<Npc> enemy = make_shared<Npc>();
+
+    shared_ptr<Npc> enemy = make_shared<Npc>(Vector2d(-300, 300), 40, player);
+
     entityHandler->addEntity(enemy, "Enemies");
 
 

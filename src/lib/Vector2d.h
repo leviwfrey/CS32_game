@@ -16,8 +16,8 @@ class Vector2d {
 
         Vector2d() {}
 
-        double x;
-        double y; 
+        double x; //speed * (normalized x)
+        double y; // speed * (normalized y)
         
         Vector2d rotate(double& angle) const { // returns a new vector rotated by a specified angle
             Vector2d rVec;

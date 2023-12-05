@@ -33,6 +33,7 @@ void EntityHandler::updateAll() {
             entity->update();
         }
     }
+    clearUnalive();
 }
 
 void EntityHandler::drawAll() {
@@ -64,6 +65,17 @@ void EntityHandler::checkCollisions() {
                         }
                     }
                 }
+            }
+        }
+    }
+}
+
+void EntityHandler::clearUnalive(){
+    //unordered_map<string, vector<shared_ptr<Entity>>> entities;
+    for(auto& pair : entities) {
+        for(size_t i = 0; i<pair.second.size(); ++i) {
+            if(pair.second.at(i)->alive() == false){
+                pair.second.erase(pair.second.begin() + i);
             }
         }
     }
