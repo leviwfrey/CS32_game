@@ -6,6 +6,7 @@
 #include "Controller.h"
 #include "EntityHandler.h"
 #include <memory>
+#include <algorithm>
 
 using namespace std;
 
@@ -13,21 +14,18 @@ using namespace std;
 int const SCREEN_WIDTH = 1400;
 int const SCREEN_HEIGHT = 1400;
 
+enum GameState {
+    START_SCREEN,
+    GAME_SCREEN,
+    END_SCREEN
+};
 
-// Instansiate needed classes
+// Instansiate needed classes and variables
 shared_ptr<EntityHandler> entityHandler = make_shared<EntityHandler>();
-shared_ptr<Player> player = make_shared<Player>(entityHandler); // Our games only Player object
-size_t hp = 0;
-
-
-void update(int value) {
-    static_cast<void>(value);
-    entityHandler->updateAll();
-    entityHandler->checkCollisions();
-    
-    glutPostRedisplay();          // calls the display function
-    glutTimerFunc(16, update, 0); // calls the update function again after 16 milliseconds (60FPS)
-}
+shared_ptr<Player> player; // Our games only Player object
+size_t score = 0;
+vector<size_t> highscores;
+GameState gameState;
 
 void drawText(double r, double g, double b, int xPos, int yPos, string text){
     glColor3f(r,g,b);  // Set text color
@@ -38,21 +36,75 @@ void drawText(double r, double g, double b, int xPos, int yPos, string text){
     }
 }
 
+void removeDuplicatesAndSort(std::vector<size_t>& arr) {
+    // Remove duplicates
+    std::sort(arr.begin(), arr.end());
+    auto last = std::unique(arr.begin(), arr.end());
+    arr.erase(last, arr.end());
+
+    // Sort in ascending order
+    std::sort(arr.begin(), arr.end());
+}
+void spawnEntities(){
+    player = make_shared<Player>(entityHandler); // Our games only Player object
+    entityHandler->addEntity(player, "Players");
+    shared_ptr<Npc> enemy = make_shared<Npc>(Vector2d(-300, 300), 40, player);
+    entityHandler->addEntity(enemy, "Enemies");
+}
+
+void drawEndScreen(){
+    entityHandler->clearAllEntities();
+    drawText(1.0, 1.0, 1.0, 300, 250, "GAME OVER");
+    drawText(1.0, 1.0, 1.0, 300, 200, "Press k to play again");
+    drawText(1.0, 1.0, 1.0, 300, 150, "Top 5 High Scores:");
+    int originaly = 100;
+    removeDuplicatesAndSort(highscores); //sorts in ascending order
+    std::reverse(highscores.begin(), highscores.end()); //now in descending order
+    int numScores = 0;
+    for(size_t score: highscores){
+        drawText(1.0, 1.0, 1.0, 300, originaly, to_string(score));
+        originaly -= 50; numScores++;
+        if(numScores >= 5){break;}
+    }
+}
+void updateGameState() {
+
+    if(player->alive()){
+        gameState = GAME_SCREEN; std::cout << "switched to game screen \n";
+    } else {
+        
+        gameState = END_SCREEN; std::cout << "switched to end screen \n";
+        highscores.push_back(score);
+        drawEndScreen();
+    }
+    
+}
+
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);                // clears the canvas
-    entityHandler->drawAll();
 
-    
-    string text = "HP: " + std::to_string(hp);
+    updateGameState();
+
+    entityHandler->drawAll();
+    string text = "Score: " + std::to_string(score);
     drawText(1.0, 1.0, 1.0, 300, 300, text);
-    hp++;
+    if(gameState == GAME_SCREEN) {score++;}
     glutSwapBuffers();  // swaps the canvas with the current screen
 }
 
 void handleKeyPress(unsigned char key, int x, int y) {
-    static_cast<void>(x);
-    static_cast<void>(y);
-    player->controller.setKey(key, true); // feeds the controller keys pressed
+
+    if(gameState == GAME_SCREEN){
+
+        static_cast<void>(x);
+        static_cast<void>(y);
+        player->controller.setKey(key, true); // feeds the controller keys pressed
+    } else if (gameState == END_SCREEN && key == 'k'){ //resets the game
+        gameState = GAME_SCREEN;
+        score = 0;
+        spawnEntities();
+    }
 }
 
 void handleKeyReleased(unsigned char key, int x, int y) {
@@ -76,16 +128,27 @@ void reshape(int width, int height) {
     glMatrixMode(GL_MODELVIEW);
 }
 
+void update(int value) {
+    updateGameState();
+    static_cast<void>(value);
+    entityHandler->updateAll();
+    entityHandler->checkCollisions();
+    
+    glutPostRedisplay();          // calls the display function
+    glutTimerFunc(16, update, 0); // calls the update function again after 16 milliseconds (60FPS)
+}
+
+
 int main(int argc, char** argv) {
 
     // Initiation:
+    gameState = START_SCREEN; std::cout << "switched to start screen \n";
     glutInit(&argc, argv);                          // Intiates screen?
     glutInitDisplayMode(GLUT_SINGLE);               //You need to do once ig
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT); //sets the size, might be pixel by pixel
     glutCreateWindow("Funny little square!!"); 
     reshape(SCREEN_WIDTH, SCREEN_HEIGHT);
     
-
     // Game Loop:
     glutDisplayFunc(display); // function that paints everything on the screen
     glutTimerFunc(25, update, 0); // function that should do all the logic for entities
@@ -94,20 +157,13 @@ int main(int argc, char** argv) {
     glutPassiveMotionFunc(mouseMotion);
     glutReshapeFunc(reshape);
     
-
     entityHandler->addGroup("Players");
     entityHandler->addGroup("Projectiles");
     entityHandler->addGroup("Enemies");
-
     entityHandler->addCollision("Players", "Enemies");
     entityHandler->addCollision("Enemies", "Projectiles");
 
-    entityHandler->addEntity(player, "Players");
-
-
-    shared_ptr<Npc> enemy = make_shared<Npc>(Vector2d(-300, 300), 40, player);
-
-    entityHandler->addEntity(enemy, "Enemies");
+    spawnEntities();
 
 
     glutMainLoop(); //runs the function.

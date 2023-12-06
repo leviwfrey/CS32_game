@@ -80,3 +80,13 @@ void EntityHandler::clearUnalive(){
         }
     }
 }
+
+void EntityHandler::clearAllEntities(){
+    //unordered_map<string, vector<shared_ptr<Entity>>> entities;
+    for(auto& pair : entities) {
+        for(size_t i = 0; i<pair.second.size(); ++i) {
+                pair.second.erase(pair.second.begin() + i);
+            
+        }
+    }
+}
