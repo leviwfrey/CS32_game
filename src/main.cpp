@@ -104,7 +104,7 @@ void handleKeyPress(unsigned char key, int x, int y) {
         score = 0;
         player = make_shared<Player>(entityHandler);
         entityHandler->addEntity(player, "Players");
-        spawnEntities(difficulty);
+        spawnEnemies(difficulty);
 
     }
 }
@@ -195,7 +195,7 @@ int main(int argc, char** argv) {
 
 
     entityHandler->addEntity(player, "Players");
-    spawnEntities(difficulty);
+    spawnEnemies(difficulty);
     glutMainLoop(); //runs the function.
     return 0;   
 }

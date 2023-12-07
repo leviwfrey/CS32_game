@@ -86,6 +86,7 @@ void EntityHandler::clearUnalive(){
                         std::cout << "enemycount: " << enemyCount << "\n";
                     }
                 pair.second.erase(pair.second.begin() + i);
+            }
         }
     }
 }
@@ -97,6 +98,7 @@ void EntityHandler::clearAllEntities() {
                 enemyCount--;
             }
             pair.second.erase(pair.second.begin() + i);
+        }
     }
 }
 
