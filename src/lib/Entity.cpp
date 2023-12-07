@@ -83,6 +83,7 @@ void Player::update() {
 
 void Player::handleCollision(shared_ptr<Entity> entity) {
     cout << getGroup() << " collided with " << entity->getGroup() << endl;
+    isAlive = false;
 }
 
 
