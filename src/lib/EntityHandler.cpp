@@ -33,7 +33,7 @@ void EntityHandler::updateAll() {
             entity->update();
         }
     }
-    clearUnalive();
+    
 }
 
 void EntityHandler::drawAll() {
@@ -68,25 +68,29 @@ void EntityHandler::checkCollisions() {
             }
         }
     }
+    clearUnalive();
 }
 
 void EntityHandler::clearUnalive(){
-    //unordered_map<string, vector<shared_ptr<Entity>>> entities;
     for(auto& pair : entities) {
         for(size_t i = 0; i<pair.second.size(); ++i) {
-            if(pair.second.at(i)->alive() == false){
+            if(!pair.second.at(i)->alive()){
                 pair.second.erase(pair.second.begin() + i);
             }
         }
     }
 }
 
-void EntityHandler::clearAllEntities(){
-    //unordered_map<string, vector<shared_ptr<Entity>>> entities;
+void EntityHandler::clearAllEntities() {
     for(auto& pair : entities) {
-        for(size_t i = 0; i<pair.second.size(); ++i) {
-                pair.second.erase(pair.second.begin() + i);
-            
+        pair.second.clear();
+    }
+}
+
+void EntityHandler::print() {
+    for(auto& pair : entities) {
+        for(size_t i = 0; i < pair.second.size(); i++) {
+            cout << pair.second.at(i)->getGroup() << endl;
         }
     }
 }

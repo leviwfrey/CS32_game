@@ -255,7 +255,6 @@ void Shotgun::shoot(Vector2d& position, double& rot, shared_ptr<EntityHandler>& 
 
         normal_distribution<double> nd2(1.0, .2);
         double rn2 = nd2(gen);
-        cout << rn2 << endl;
         
         shared_ptr<Projectile> projectile = make_shared<Projectile>(model, position, rot + M_PI/15 * rn1, 13, fabs(speed * rn2), damage, group, 1.0, .05, .05);    
         handler->addEntity(projectile, group);

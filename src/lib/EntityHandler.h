@@ -23,6 +23,7 @@ class EntityHandler {
         void drawAll();
         void clearUnalive();
         void clearAllEntities();
+        void print();
     private:
         unordered_map<string, vector<shared_ptr<Entity>>> entities;
         unordered_map<string, unordered_map<string, bool>> collisionMatrix;
