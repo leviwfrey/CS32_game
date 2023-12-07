@@ -1,3 +1,0 @@
-/home/thejojochen/CS32_game/CMakeFiles/rebuild_cache.dir
-/home/thejojochen/CS32_game/CMakeFiles/edit_cache.dir
-/home/thejojochen/CS32_game/CMakeFiles/main.dir

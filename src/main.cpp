@@ -26,7 +26,6 @@ enum GameState {
 shared_ptr<EntityHandler> entityHandler = make_shared<EntityHandler>();
 size_t difficulty = 0;
 shared_ptr<Player> player = make_shared<Player>(entityHandler); // Our games only Player object
-size_t score = 0;
 vector<size_t> highscores;
 GameState gameState;
 
@@ -64,7 +63,7 @@ void drawEndScreen(){
     
     drawText(1.0, 1.0, 1.0, 300, 250, "GAME OVER");
     drawText(1.0, 1.0, 1.0, 300, 200, "Press k to play again");
-    drawText(1.0, 1.0, 1.0, 300, 150, "Top 5 High Scores:");
+    drawText(1.0, 1.0, 1.0, 300, 150, "Top 5 Attempts By Difficulty Reached:");
     int originaly = 100;
     removeDuplicatesAndSort(highscores); //sorts in ascending order
     std::reverse(highscores.begin(), highscores.end()); //now in descending order
@@ -83,9 +82,6 @@ void display() {
         string text2 = "Difficulty: " + std::to_string(difficulty);
         drawText(1.0, 1.0, 1.0, 500, 450, text2);
         entityHandler->drawAll();
-        string text = "Score: " + std::to_string(score);
-        drawText(1.0, 1.0, 1.0, 300, 300, text);
-        score++;
     } else if(gameState == END_SCREEN) {
         drawEndScreen();
     }
@@ -101,7 +97,6 @@ void handleKeyPress(unsigned char key, int x, int y) {
     } else if (gameState == END_SCREEN && key == 'k'){ //resets the game
         gameState = GAME_SCREEN;
         difficulty = 0;
-        score = 0;
         player = make_shared<Player>(entityHandler);
         entityHandler->addEntity(player, "Players");
         spawnEnemies(difficulty);
@@ -143,7 +138,7 @@ void update(int value) {
         if(!player->alive()) {
             player = nullptr;
             gameState = END_SCREEN;
-            highscores.push_back(score);
+            highscores.push_back(difficulty);
             entityHandler->clearAllEntities();
         }
         if(entityHandler->empty("Enemies")){
