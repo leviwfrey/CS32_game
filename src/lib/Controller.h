@@ -9,8 +9,8 @@ class Controller {
     public:
 
         Controller() {
-            for(size_t i = 0; i < keyStates.size(); i++) {
-                keyStates[i]
+            for(size_t i = 0; i < 256; i++) {
+                keyStates[i] = false;
             }
         }
 
