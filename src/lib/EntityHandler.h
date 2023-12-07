@@ -24,6 +24,7 @@ class EntityHandler {
         void clearUnalive();
         void clearAllEntities();
         size_t getEnemyCount(){return enemyCount;}
+        void print();
     private:
         unordered_map<string, vector<shared_ptr<Entity>>> entities;
         unordered_map<string, unordered_map<string, bool>> collisionMatrix;

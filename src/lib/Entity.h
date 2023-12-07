@@ -8,6 +8,8 @@
 #include "Collider.h"
 #include "TimerHandler.h"
 #include <chrono>
+#include <random>
+
 
 using namespace std;
 
@@ -26,6 +28,51 @@ class HealthBar {
         double width;
         int maxHP;
         int currentHP;
+};
+
+class Weapon {
+    using WeaponTimerHandler = TimerHandler<Weapon>;
+    public:
+        virtual void shoot(Vector2d& position, double& rot, shared_ptr<EntityHandler>& handler, string group) = 0;
+        void resetCooldown() { ready = true; }
+        void update() { timers.update(); }
+        bool canShoot() const { return ready; }
+
+    protected:
+        bool ready = true;
+        WeaponTimerHandler timers = WeaponTimerHandler();
+
+};
+
+class Shotgun : public Weapon {
+    public:
+        void shoot(Vector2d& position, double& rot, shared_ptr<EntityHandler>& handler, string group);
+
+    private:
+        double size = 13;
+        Vector2d p1 = Vector2d(size/2, 0);
+        Vector2d p2 = Vector2d(-size/2, -size/2*.8);
+        Vector2d p3 = Vector2d(-size/2, size/2*.8);
+
+        vector<Vector2d> model = {p1, p2, p3};
+        double speed = 20;
+        double damage = 2;
+        chrono::milliseconds cooldown = chrono::milliseconds(750);
+};
+
+class Sniper : public Weapon {
+    public:
+        void shoot(Vector2d& position, double& rot, shared_ptr<EntityHandler>& handler, string group);
+    private:
+        double size = 20;
+        Vector2d p1 = Vector2d(-size/2, size/3);
+        Vector2d p2 = Vector2d(size/2, size/3);
+        Vector2d p3 = Vector2d(size/2, -size/3);
+        Vector2d p4 = Vector2d(-size/2, -size/3);
+        vector<Vector2d> model = {p1,p2,p3,p4};
+        double speed = 20;
+        double damage = 75;
+        chrono::milliseconds cooldown = chrono::milliseconds(1100);
 };
 
 class Entity { 
@@ -52,6 +99,10 @@ class Entity {
         bool alive(){return isAlive;}
         bool isEnemy(){return _isEnemy;}
 
+        void kill();
+
+        void damage(int amount);
+
     protected:
         Vector2d pos = Vector2d(0, 0);
         Vector2d vel = Vector2d(0, 0);
@@ -60,17 +111,19 @@ class Entity {
         string group = "all";
         bool isAlive = true;
         bool _isEnemy;
+
+        HealthBar healthBar = HealthBar(100, 50);
+        double size = 50;
 };
 
 class Player: public Entity {
-    using PlayerTimerHandler = TimerHandler<Player>;
+    
     public:
         Player(shared_ptr<EntityHandler> entityHandler, Vector2d position = Vector2d(0, 0), double size = 50);
 
         void draw();
         void update();
         void handleCollision(shared_ptr<Entity> entity);
-        void resetCoolDown();
 
         Controller controller;   
 
@@ -85,42 +138,63 @@ class Player: public Entity {
         double size;
 
         //physics
-        double speed = 11;
+        double speed = 8;
 
         //weapon
-        chrono::milliseconds weaponCooldown = chrono::milliseconds(250);
-        bool canShoot = true;
-        PlayerTimerHandler timers;
+        shared_ptr<Weapon> weapon = make_shared<Shotgun>();
         shared_ptr<EntityHandler> entityHandler;
 };
 
 class Npc: public Entity {
 
     public:
-        Npc(Vector2d position = Vector2d(0, 0), double size = 50, shared_ptr<Player> _player = nullptr);
+        Npc(Vector2d position, double size, shared_ptr<Player> _player);
 
         void draw();
         void update();
         void handleCollision(shared_ptr<Entity> entity);
 
-        double size = 40;
-        
 
         vector<Vector2d> body;
 
         
     private:
-        double speed = 3;
+        double speed = 5;
+        double hp = 150;
         shared_ptr<Player> player;
+
         HealthBar healthBar = HealthBar(55, 100); //width, maxHp
         Vector2d healthBarPos;
 
 };
 
+class SniperEnemy : public Entity {
+    public:
+        SniperEnemy(Vector2d position, double size, shared_ptr<Player> player, shared_ptr<EntityHandler> entityHandler);
+
+    void draw();
+    void update();
+    void handleCollision(shared_ptr<Entity> entity);
+    
+        
+    private:
+        shared_ptr<Weapon> weapon = make_shared<Sniper>();
+        shared_ptr<EntityHandler> entityHandler;
+        
+        shared_ptr<Player> player;
+
+        Vector2d firePoint;
+        Vector2d healthBarPos;
+        vector<Vector2d> model;
+
+        double range = 450;
+        double speed = 3;
+        double hp = 50;
+};
+
 class Projectile : public Entity {
     public:
-        Projectile(Vector2d position, double rot, double size = 26, string group = "Projectiles");
-
+        Projectile(vector<Vector2d>& model, Vector2d& position, double rotation, double size, double speed, double damage, string group, double R = 1.0, double G = 1.0, double B = 1.0);
         void draw();
         void update();
         void handleCollision(shared_ptr<Entity> entity);
@@ -128,8 +202,14 @@ class Projectile : public Entity {
     private:
         vector<Vector2d> model;
         double size;
-        double speed = 20;
+        double speed;
+        double damage;
+        double R;
+        double G;
+        double B;
 
 };
+
+
 
 #endif

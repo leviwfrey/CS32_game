@@ -8,6 +8,12 @@ using namespace std;
 class Controller {
     public:
 
+        Controller() {
+            for(size_t i = 0; i < 256; i++) {
+                keyStates[i] = false;
+            }
+        }
+
         void update() {
             
             if(keyStates[32]) {
@@ -116,6 +122,7 @@ class Controller {
 
         bool spaceTrigger = false;
         bool spaceDown = false;
+
 
         double fix_x_dir = 0;
         double fix_y_dir = 0;

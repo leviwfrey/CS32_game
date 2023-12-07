@@ -24,10 +24,12 @@ enum GameState {
 
 // Instansiate needed classes and variables
 shared_ptr<EntityHandler> entityHandler = make_shared<EntityHandler>();
-shared_ptr<Player> player; // Our games only Player object
-size_t score = 0; size_t difficulty = 0;
+size_t difficulty = 0;
+shared_ptr<Player> player = make_shared<Player>(entityHandler); // Our games only Player object
+size_t score = 0;
 vector<size_t> highscores;
 GameState gameState;
+
 void drawText(double r, double g, double b, int xPos, int yPos, string text){
     glColor3f(r,g,b);  // Set text color
     glRasterPos2f(xPos, yPos);  // Set the starting position for the text
@@ -46,14 +48,8 @@ void removeDuplicatesAndSort(std::vector<size_t>& arr) {
     // Sort in ascending order
     std::sort(arr.begin(), arr.end());
 }
-void spawnPlayer(){
-    player = make_shared<Player>(entityHandler); // Our games only Player object
-    entityHandler->addEntity(player, "Players");
-}
 
 void spawnEnemies(size_t _difficulty){
-
-    
     if(gameState == GAME_SCREEN){
     
         Difficulty diff = Difficulty(player);
@@ -65,7 +61,7 @@ void spawnEnemies(size_t _difficulty){
 }
 
 void drawEndScreen(){
-    entityHandler->clearAllEntities();
+    
     drawText(1.0, 1.0, 1.0, 300, 250, "GAME OVER");
     drawText(1.0, 1.0, 1.0, 300, 200, "Press k to play again");
     drawText(1.0, 1.0, 1.0, 300, 150, "Top 5 High Scores:");
@@ -79,64 +75,55 @@ void drawEndScreen(){
         if(numScores >= 5){break;}
     }
 }
-void updateGameState() {
-
-    if(entityHandler->getEnemyCount() == 0){
-        if(gameState == GAME_SCREEN){difficulty++;}
-        if(difficulty > MAX_DIFFICULTY){gameState = END_SCREEN;difficulty--;highscores.push_back(difficulty);drawEndScreen();return;}
-        spawnEnemies(difficulty);
-    }
-
-    if(player->alive()){
-        gameState = GAME_SCREEN; //std::cout << "switched to game screen \n";
-    } else {
-        
-        gameState = END_SCREEN; //std::cout << "switched to end screen \n";
-        highscores.push_back(difficulty);
-        drawEndScreen();
-    }
-    
-}
 
 
 void display() {
-    glClear(GL_COLOR_BUFFER_BIT);                // clears the canvas
-
-    updateGameState();
-
-    entityHandler->drawAll();
-
-    string text2 = "Difficulty: " + std::to_string(difficulty);
-    drawText(1.0, 1.0, 1.0, 500, 450, text2);
+    glClear(GL_COLOR_BUFFER_BIT);    
+    if (gameState == GAME_SCREEN) {
+        string text2 = "Difficulty: " + std::to_string(difficulty);
+        drawText(1.0, 1.0, 1.0, 500, 450, text2);
+        entityHandler->drawAll();
+        string text = "Score: " + std::to_string(score);
+        drawText(1.0, 1.0, 1.0, 300, 300, text);
+        score++;
+    } else if(gameState == END_SCREEN) {
+        drawEndScreen();
+    }
     glutSwapBuffers();  // swaps the canvas with the current screen
 }
 
 void handleKeyPress(unsigned char key, int x, int y) {
 
     if(gameState == GAME_SCREEN){
-
         static_cast<void>(x);
         static_cast<void>(y);
         player->controller.setKey(key, true); // feeds the controller keys pressed
     } else if (gameState == END_SCREEN && key == 'k'){ //resets the game
         gameState = GAME_SCREEN;
         difficulty = 0;
-        spawnPlayer();
-        spawnEnemies(difficulty);
+        score = 0;
+        player = make_shared<Player>(entityHandler);
+        entityHandler->addEntity(player, "Players");
+        spawnEntities(difficulty);
+
     }
 }
 
 void handleKeyReleased(unsigned char key, int x, int y) {
-    static_cast<void>(x);
-    static_cast<void>(y);
-    player->controller.setKey(key, false); // feeds the controller keys unpressed
+    if(gameState == GAME_SCREEN) {
+        static_cast<void>(x); 
+        static_cast<void>(y);
+        player->controller.setKey(key, false); // feeds the controller keys unpressed
+    }
 }
 
 void mouseMotion(int x, int y) {
-    Vector2d mousePos;
-    mousePos.x = x - (SCREEN_WIDTH / 2);
-    mousePos.y = (SCREEN_HEIGHT / 2) - y;
-    player->controller.setMousePos(mousePos); // feeds controller the position of the mouse on the screen
+    if(gameState == GAME_SCREEN) {
+        Vector2d mousePos;
+        mousePos.x = x - (SCREEN_WIDTH / 2);
+        mousePos.y = (SCREEN_HEIGHT / 2) - y;
+        player->controller.setMousePos(mousePos); // feeds controller the position of the mouse on the screen
+    }
 }
 
 void reshape(int width, int height) {
@@ -148,10 +135,30 @@ void reshape(int width, int height) {
 }
 
 void update(int value) {
-    updateGameState();
-    static_cast<void>(value);
-    entityHandler->updateAll();
-    entityHandler->checkCollisions();
+    if(gameState == GAME_SCREEN) {
+        entityHandler->print();
+        cout << "----------" << endl;
+        static_cast<void>(value);
+        entityHandler->updateAll();
+        entityHandler->checkCollisions();
+        if(!player->alive()) {
+            player = nullptr;
+            gameState = END_SCREEN;
+            highscores.push_back(score);
+            entityHandler->clearAllEntities();
+        }
+        if(entityHandler->getEnemyCount() == 0){
+            difficulty++;
+            if(difficulty > MAX_DIFFICULTY){
+              gameState = END_SCREEN;
+              difficulty--;
+              highscores.push_back(difficulty);
+              drawEndScreen();return;}
+              spawnEnemies(difficulty);
+          }
+    } else {
+        entityHandler->print();
+    }
     
     glutPostRedisplay();          // calls the display function
     glutTimerFunc(16, update, 0); // calls the update function again after 16 milliseconds (60FPS)
@@ -161,7 +168,7 @@ void update(int value) {
 int main(int argc, char** argv) {
 
     // Initiation:
-    gameState = START_SCREEN; //std::cout << "switched to start screen \n";
+    gameState = GAME_SCREEN;
     glutInit(&argc, argv);                          // Intiates screen?
     glutInitDisplayMode(GLUT_SINGLE);               //You need to do once ig
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT); //sets the size, might be pixel by pixel
@@ -179,13 +186,18 @@ int main(int argc, char** argv) {
     entityHandler->addGroup("Players");
     entityHandler->addGroup("Projectiles");
     entityHandler->addGroup("Enemies");
+    entityHandler->addGroup("EnemyProjectiles");
+
     entityHandler->addCollision("Players", "Enemies");
     entityHandler->addCollision("Enemies", "Projectiles");
 
-    spawnPlayer();
+
     spawnEnemies(difficulty);
+    entityHandler->addCollision("Players", "EnemyProjectiles");
 
 
+    entityHandler->addEntity(player, "Players");
+    spawnEntities(difficulty);
     glutMainLoop(); //runs the function.
     return 0;   
 }
