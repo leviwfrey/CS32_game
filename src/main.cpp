@@ -160,10 +160,32 @@ int main(int argc, char** argv) {
     entityHandler->addGroup("Players");
     entityHandler->addGroup("Projectiles");
     entityHandler->addGroup("Enemies");
+    entityHandler->addGroup("EnemyProjectiles");
+
     entityHandler->addCollision("Players", "Enemies");
     entityHandler->addCollision("Enemies", "Projectiles");
+    entityHandler->addCollision("Players", "EnemyProjectiles");
+
+
+    entityHandler->addEntity(player, "Players");
+
+
+    shared_ptr<SniperEnemy> enemy1 = make_shared<SniperEnemy>(Vector2d(-800, 0), 40, player, entityHandler);
+    entityHandler->addEntity(enemy1, "Enemies");
+
+    shared_ptr<SniperEnemy> enemy2 = make_shared<SniperEnemy>(Vector2d(0, 800), 40, player, entityHandler);
+    entityHandler->addEntity(enemy2, "Enemies");
+
+    shared_ptr<Npc> enemy3 = make_shared<Npc>(Vector2d(800, 0), 80, player);
+    entityHandler->addEntity(enemy3, "Enemies");
+
+    shared_ptr<Npc> enemy4 = make_shared<Npc>(Vector2d(0, -800), 80, player);
+    entityHandler->addEntity(enemy4, "Enemies");
+
+    
 
     spawnEntities();
+
 
 
     glutMainLoop(); //runs the function.
