@@ -5,6 +5,7 @@
 #include "Entity.h"
 #include "Controller.h"
 #include "EntityHandler.h"
+#include "Difficulty.h"
 #include <memory>
 #include <algorithm>
 
@@ -13,6 +14,7 @@ using namespace std;
 //Global Constants
 int const SCREEN_WIDTH = 1400;
 int const SCREEN_HEIGHT = 1400;
+size_t const MAX_DIFFICULTY = 3;
 
 enum GameState {
     START_SCREEN,
@@ -22,6 +24,7 @@ enum GameState {
 
 // Instansiate needed classes and variables
 shared_ptr<EntityHandler> entityHandler = make_shared<EntityHandler>();
+size_t difficulty = 0;
 shared_ptr<Player> player = make_shared<Player>(entityHandler); // Our games only Player object
 size_t score = 0;
 vector<size_t> highscores;
@@ -46,20 +49,15 @@ void removeDuplicatesAndSort(std::vector<size_t>& arr) {
     std::sort(arr.begin(), arr.end());
 }
 
-void spawnEntities(){
+void spawnEnemies(size_t _difficulty){
+    if(gameState == GAME_SCREEN){
     
-    
-    shared_ptr<SniperEnemy> enemy1 = make_shared<SniperEnemy>(Vector2d(-800, 0), 40, player, entityHandler);
-    entityHandler->addEntity(enemy1, "Enemies");
-
-    shared_ptr<SniperEnemy> enemy2 = make_shared<SniperEnemy>(Vector2d(0, 800), 40, player, entityHandler);
-    entityHandler->addEntity(enemy2, "Enemies");
-
-    shared_ptr<Npc> enemy3 = make_shared<Npc>(Vector2d(800, 0), 80, player);
-    entityHandler->addEntity(enemy3, "Enemies");
-
-    shared_ptr<Npc> enemy4 = make_shared<Npc>(Vector2d(0, -800), 80, player);
-    entityHandler->addEntity(enemy4, "Enemies");
+        Difficulty diff = Difficulty(player);
+        vector<shared_ptr<Entity>> enemies = diff.getEnemiesByDifficulty(_difficulty);
+        for(shared_ptr<Entity> npc : enemies){
+            entityHandler->addEntity(npc, "Enemies");
+        }
+    }
 }
 
 void drawEndScreen(){
@@ -78,9 +76,12 @@ void drawEndScreen(){
     }
 }
 
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);    
     if (gameState == GAME_SCREEN) {
+        string text2 = "Difficulty: " + std::to_string(difficulty);
+        drawText(1.0, 1.0, 1.0, 500, 450, text2);
         entityHandler->drawAll();
         string text = "Score: " + std::to_string(score);
         drawText(1.0, 1.0, 1.0, 300, 300, text);
@@ -88,7 +89,6 @@ void display() {
     } else if(gameState == END_SCREEN) {
         drawEndScreen();
     }
-    
     glutSwapBuffers();  // swaps the canvas with the current screen
 }
 
@@ -100,10 +100,12 @@ void handleKeyPress(unsigned char key, int x, int y) {
         player->controller.setKey(key, true); // feeds the controller keys pressed
     } else if (gameState == END_SCREEN && key == 'k'){ //resets the game
         gameState = GAME_SCREEN;
+        difficulty = 0;
         score = 0;
         player = make_shared<Player>(entityHandler);
         entityHandler->addEntity(player, "Players");
-        spawnEntities();
+        spawnEntities(difficulty);
+
     }
 }
 
@@ -145,6 +147,15 @@ void update(int value) {
             highscores.push_back(score);
             entityHandler->clearAllEntities();
         }
+        if(entityHandler->getEnemyCount() == 0){
+            difficulty++;
+            if(difficulty > MAX_DIFFICULTY){
+              gameState = END_SCREEN;
+              difficulty--;
+              highscores.push_back(difficulty);
+              drawEndScreen();return;}
+              spawnEnemies(difficulty);
+          }
     } else {
         entityHandler->print();
     }
@@ -179,11 +190,14 @@ int main(int argc, char** argv) {
 
     entityHandler->addCollision("Players", "Enemies");
     entityHandler->addCollision("Enemies", "Projectiles");
+
+
+    spawnEnemies(difficulty);
     entityHandler->addCollision("Players", "EnemyProjectiles");
 
 
     entityHandler->addEntity(player, "Players");
-    spawnEntities();
+    spawnEntities(difficulty);
     glutMainLoop(); //runs the function.
     return 0;   
 }
