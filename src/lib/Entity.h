@@ -97,7 +97,6 @@ class Entity {
 
         Collider getCollider() const;
         bool alive(){return isAlive;}
-        bool isEnemy(){return _isEnemy;}
 
         void kill();
 
@@ -110,8 +109,6 @@ class Entity {
         Collider collider = Collider(0);
         string group = "all";
         bool isAlive = true;
-        bool _isEnemy;
-
         HealthBar healthBar = HealthBar(100, 50);
         double size = 50;
 };
@@ -159,11 +156,9 @@ class Npc: public Entity {
 
         
     private:
-        double speed = 5;
+        double speed = 4;
         double hp = 150;
         shared_ptr<Player> player;
-
-        HealthBar healthBar = HealthBar(55, 100); //width, maxHp
         Vector2d healthBarPos;
 
 };

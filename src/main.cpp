@@ -139,13 +139,14 @@ void update(int value) {
         static_cast<void>(value);
         entityHandler->updateAll();
         entityHandler->checkCollisions();
+        entityHandler->print();
         if(!player->alive()) {
             player = nullptr;
             gameState = END_SCREEN;
             highscores.push_back(score);
             entityHandler->clearAllEntities();
         }
-        if(entityHandler->getEnemyCount() == 0){
+        if(entityHandler->empty("Enemies")){
             difficulty++;
             if(difficulty > MAX_DIFFICULTY){
               gameState = END_SCREEN;
@@ -189,8 +190,6 @@ int main(int argc, char** argv) {
     entityHandler->addCollision("Players", "Enemies");
     entityHandler->addCollision("Enemies", "Projectiles");
 
-
-    spawnEnemies(difficulty);
     entityHandler->addCollision("Players", "EnemyProjectiles");
 
 

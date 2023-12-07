@@ -37,7 +37,6 @@ Player::Player(shared_ptr<EntityHandler> entityHandler, Vector2d position, doubl
     this->group = "Players";
     this->collider = Collider(size/2, pos);
     this->entityHandler = entityHandler;
-    this->_isEnemy = false;
 
     this->size = size;
     // Model for player
@@ -96,7 +95,6 @@ Npc::Npc(Vector2d position, double size, shared_ptr<Player> _player) {
     this->collider = Collider(size * 0.707, pos); //parameter sets the size of the hitbox
     this->rot = 0;
     this->group = "Enemies";
-    this->_isEnemy = true;
 
     Vector2d p1 = Vector2d(-size/2, size/2);
     Vector2d p2 = Vector2d(size/2, size/2);
@@ -192,7 +190,6 @@ Projectile::Projectile(vector<Vector2d>& model, Vector2d& position, double rotat
     this->G = G;
     this->B = B;
     vel = Vector2d(speed, 0).rotate(rot);
-    this->_isEnemy = false;
 
     Vector2d p1 = Vector2d(size/2, 0);
     Vector2d p2 = Vector2d(-size/2, -size/2*.8);
@@ -214,7 +211,9 @@ void Projectile::update() {
 }
 
 void Projectile::handleCollision(shared_ptr<Entity> entity) {
-    entity->damage(damage);
+    if(alive()) {
+        entity->damage(damage);
+    }
     kill();
 }
 
