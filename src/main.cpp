@@ -48,7 +48,6 @@ void removeDuplicatesAndSort(std::vector<size_t>& arr) {
 
 void spawnEntities(){
     
-    
     shared_ptr<SniperEnemy> enemy1 = make_shared<SniperEnemy>(Vector2d(-800, 0), 40, player, entityHandler);
     entityHandler->addEntity(enemy1, "Enemies");
 
@@ -134,8 +133,6 @@ void reshape(int width, int height) {
 
 void update(int value) {
     if(gameState == GAME_SCREEN) {
-        entityHandler->print();
-        cout << "----------" << endl;
         static_cast<void>(value);
         entityHandler->updateAll();
         entityHandler->checkCollisions();
