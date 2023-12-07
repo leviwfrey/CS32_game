@@ -5,6 +5,7 @@
 #include "Entity.h"
 #include "Controller.h"
 #include "EntityHandler.h"
+#include "Difficulty.h"
 #include <memory>
 #include <algorithm>
 
@@ -13,6 +14,7 @@ using namespace std;
 //Global Constants
 int const SCREEN_WIDTH = 1400;
 int const SCREEN_HEIGHT = 1400;
+size_t const MAX_DIFFICULTY = 3;
 
 enum GameState {
     START_SCREEN,
@@ -23,10 +25,9 @@ enum GameState {
 // Instansiate needed classes and variables
 shared_ptr<EntityHandler> entityHandler = make_shared<EntityHandler>();
 shared_ptr<Player> player; // Our games only Player object
-size_t score = 0;
+size_t score = 0; size_t difficulty = 0;
 vector<size_t> highscores;
 GameState gameState;
-
 void drawText(double r, double g, double b, int xPos, int yPos, string text){
     glColor3f(r,g,b);  // Set text color
     glRasterPos2f(xPos, yPos);  // Set the starting position for the text
@@ -45,11 +46,22 @@ void removeDuplicatesAndSort(std::vector<size_t>& arr) {
     // Sort in ascending order
     std::sort(arr.begin(), arr.end());
 }
-void spawnEntities(){
+void spawnPlayer(){
     player = make_shared<Player>(entityHandler); // Our games only Player object
     entityHandler->addEntity(player, "Players");
-    shared_ptr<Npc> enemy = make_shared<Npc>(Vector2d(-300, 300), 40, player);
-    entityHandler->addEntity(enemy, "Enemies");
+}
+
+void spawnEnemies(size_t _difficulty){
+
+    
+    if(gameState == GAME_SCREEN){
+    
+        Difficulty diff = Difficulty(player);
+        vector<shared_ptr<Entity>> enemies = diff.getEnemiesByDifficulty(_difficulty);
+        for(shared_ptr<Entity> npc : enemies){
+            entityHandler->addEntity(npc, "Enemies");
+        }
+    }
 }
 
 void drawEndScreen(){
@@ -69,12 +81,18 @@ void drawEndScreen(){
 }
 void updateGameState() {
 
+    if(entityHandler->getEnemyCount() == 0){
+        if(gameState == GAME_SCREEN){difficulty++;}
+        if(difficulty > MAX_DIFFICULTY){gameState = END_SCREEN;difficulty--;highscores.push_back(difficulty);drawEndScreen();return;}
+        spawnEnemies(difficulty);
+    }
+
     if(player->alive()){
-        gameState = GAME_SCREEN; std::cout << "switched to game screen \n";
+        gameState = GAME_SCREEN; //std::cout << "switched to game screen \n";
     } else {
         
-        gameState = END_SCREEN; std::cout << "switched to end screen \n";
-        highscores.push_back(score);
+        gameState = END_SCREEN; //std::cout << "switched to end screen \n";
+        highscores.push_back(difficulty);
         drawEndScreen();
     }
     
@@ -87,9 +105,9 @@ void display() {
     updateGameState();
 
     entityHandler->drawAll();
-    string text = "Score: " + std::to_string(score);
-    drawText(1.0, 1.0, 1.0, 300, 300, text);
-    if(gameState == GAME_SCREEN) {score++;}
+
+    string text2 = "Difficulty: " + std::to_string(difficulty);
+    drawText(1.0, 1.0, 1.0, 500, 450, text2);
     glutSwapBuffers();  // swaps the canvas with the current screen
 }
 
@@ -102,8 +120,9 @@ void handleKeyPress(unsigned char key, int x, int y) {
         player->controller.setKey(key, true); // feeds the controller keys pressed
     } else if (gameState == END_SCREEN && key == 'k'){ //resets the game
         gameState = GAME_SCREEN;
-        score = 0;
-        spawnEntities();
+        difficulty = 0;
+        spawnPlayer();
+        spawnEnemies(difficulty);
     }
 }
 
@@ -142,7 +161,7 @@ void update(int value) {
 int main(int argc, char** argv) {
 
     // Initiation:
-    gameState = START_SCREEN; std::cout << "switched to start screen \n";
+    gameState = START_SCREEN; //std::cout << "switched to start screen \n";
     glutInit(&argc, argv);                          // Intiates screen?
     glutInitDisplayMode(GLUT_SINGLE);               //You need to do once ig
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT); //sets the size, might be pixel by pixel
@@ -163,7 +182,8 @@ int main(int argc, char** argv) {
     entityHandler->addCollision("Players", "Enemies");
     entityHandler->addCollision("Enemies", "Projectiles");
 
-    spawnEntities();
+    spawnPlayer();
+    spawnEnemies(difficulty);
 
 
     glutMainLoop(); //runs the function.

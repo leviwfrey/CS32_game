@@ -50,6 +50,7 @@ class Entity {
 
         Collider getCollider() const;
         bool alive(){return isAlive;}
+        bool isEnemy(){return _isEnemy;}
 
     protected:
         Vector2d pos = Vector2d(0, 0);
@@ -58,6 +59,7 @@ class Entity {
         Collider collider = Collider(0);
         string group = "all";
         bool isAlive = true;
+        bool _isEnemy;
 };
 
 class Player: public Entity {
@@ -110,7 +112,7 @@ class Npc: public Entity {
     private:
         double speed = 3;
         shared_ptr<Player> player;
-        HealthBar healthBar = HealthBar(55, 100);
+        HealthBar healthBar = HealthBar(55, 100); //width, maxHp
         Vector2d healthBarPos;
 
 };

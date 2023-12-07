@@ -1,7 +1,9 @@
 #include "EntityHandler.h"
 #include <iostream>
 
-EntityHandler::EntityHandler() {}
+EntityHandler::EntityHandler() {
+    enemyCount = 0;
+}
 
 void EntityHandler::addGroup(string newGroup, vector<string> collisions) {
     entities[newGroup] = vector<shared_ptr<Entity>>();
@@ -25,6 +27,10 @@ void EntityHandler::addGroup(string newGroup, vector<string> collisions) {
 
 void EntityHandler::addEntity(shared_ptr<Entity> entity, string group) {
     entities[group].push_back(entity);
+    if(entity->isEnemy()){
+        enemyCount++;
+        std::cout << "enemycount: " << enemyCount << "\n";
+    }
 }
 
 void EntityHandler::updateAll() {
@@ -75,7 +81,12 @@ void EntityHandler::clearUnalive(){
     for(auto& pair : entities) {
         for(size_t i = 0; i<pair.second.size(); ++i) {
             if(pair.second.at(i)->alive() == false){
+                    if(pair.second.at(i)->isEnemy()){
+                        enemyCount--;
+                        std::cout << "enemycount: " << enemyCount << "\n";
+                    }
                 pair.second.erase(pair.second.begin() + i);
+                
             }
         }
     }
@@ -85,8 +96,11 @@ void EntityHandler::clearAllEntities(){
     //unordered_map<string, vector<shared_ptr<Entity>>> entities;
     for(auto& pair : entities) {
         for(size_t i = 0; i<pair.second.size(); ++i) {
-                pair.second.erase(pair.second.begin() + i);
-            
+            if(pair.second.at(i)->isEnemy()){
+                enemyCount--;
+            }
+            pair.second.erase(pair.second.begin() + i);
         }
     }
+    std::cout << "cleared all, enemycount: " << enemyCount << "\n";
 }
