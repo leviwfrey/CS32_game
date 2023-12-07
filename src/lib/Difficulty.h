@@ -21,9 +21,9 @@ class Difficulty {
             player = _player;
             
             //set various types of enemies
-            enemy1 = make_shared<Npc>(Vector2d(-300, 300), 40, player);
-            enemy2 = make_shared<Npc>(Vector2d(-300, -300), 40, player);
-            enemy3 = make_shared<Npc>(Vector2d(300, 300), 40, player);
+            shared_ptr<Npc> enemy1 = make_shared<Npc>(Vector2d(-300, 300), 70, player);
+            shared_ptr<Npc> enemy2 = make_shared<Npc>(Vector2d(-300, -300), 70, player);
+            shared_ptr<Npc> enemy3 = make_shared<Npc>(Vector2d(300, 300), 70, player);
 
             //diff 1
             vec1.push_back(enemy1);
@@ -45,7 +45,6 @@ class Difficulty {
 
     private:
         shared_ptr<Player> player;
-        shared_ptr<Entity> enemy1, enemy2, enemy3;
         vector<shared_ptr<Entity>> vec1, vec2, vec3;
         unordered_map<size_t, vector<shared_ptr<Entity>>> enemiesByDifficulty;
 
