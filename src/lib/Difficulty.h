@@ -21,19 +21,19 @@ class Difficulty {
             player = _player;
             
             //set various types of enemies (800 is approximately outside the play area)
-            shared_ptr<Npc> npc1 = make_shared<Npc>(Vector2d(-800, 300), 70, _player);
-            shared_ptr<Npc> npc2 = make_shared<Npc>(Vector2d(-300, -800), 70, _player);
-            shared_ptr<Npc> npc3 = make_shared<Npc>(Vector2d(800, 800), 70, _player);
-            shared_ptr<Npc> npc4 = make_shared<Npc>(Vector2d(800, 800), 70, _player);
-            shared_ptr<Npc> npc5 = make_shared<Npc>(Vector2d(800, 800), 70, _player);
-            shared_ptr<Npc> npc6 = make_shared<Npc>(Vector2d(800, 800), 70, _player);
-            shared_ptr<Npc> npc7 = make_shared<Npc>(Vector2d(800, 800), 70, _player);
-            shared_ptr<Npc> npc8 = make_shared<Npc>(Vector2d(800, 800), 70, _player);
+            shared_ptr<Npc> npc1 = make_shared<Npc>(Vector2d(-800, 500), 70, _player);
+            shared_ptr<Npc> npc2 = make_shared<Npc>(Vector2d(-800, -500), 70, _player);
+            shared_ptr<Npc> npc3 = make_shared<Npc>(Vector2d(-600, -800), 70, _player);
+            shared_ptr<Npc> npc4 = make_shared<Npc>(Vector2d(-500, -800), 70, _player);
+            shared_ptr<Npc> npc5 = make_shared<Npc>(Vector2d(500, -800), 70, _player);
+            shared_ptr<Npc> npc6 = make_shared<Npc>(Vector2d(600, -800), 70, _player);
+            shared_ptr<Npc> npc7 = make_shared<Npc>(Vector2d(800, 500), 70, _player);
+            shared_ptr<Npc> npc8 = make_shared<Npc>(Vector2d(800, 600), 70, _player);
 
-            shared_ptr<SniperEnemy> sniper1 = make_shared<SniperEnemy>(Vector2d(700, 700), 70, _player, _entityHandler);
-            shared_ptr<SniperEnemy> sniper2 = make_shared<SniperEnemy>(Vector2d(-700, 700), 70, _player, _entityHandler);
-            shared_ptr<SniperEnemy> sniper3 = make_shared<SniperEnemy>(Vector2d(-700, -700), 70, _player, _entityHandler);
-            shared_ptr<SniperEnemy> sniper4 = make_shared<SniperEnemy>(Vector2d(700, -700), 70, _player, _entityHandler);
+            shared_ptr<SniperEnemy> sniper1 = make_shared<SniperEnemy>(Vector2d(600, 600), 70, _player, _entityHandler);
+            shared_ptr<SniperEnemy> sniper2 = make_shared<SniperEnemy>(Vector2d(-600, 600), 70, _player, _entityHandler);
+            shared_ptr<SniperEnemy> sniper3 = make_shared<SniperEnemy>(Vector2d(-600, -600), 70, _player, _entityHandler);
+            shared_ptr<SniperEnemy> sniper4 = make_shared<SniperEnemy>(Vector2d(600, -600), 70, _player, _entityHandler);
             
 
             //diff 1
@@ -45,16 +45,22 @@ class Difficulty {
             vec3.push_back(npc2);
             vec3.push_back(npc3);
             //diff 4
-            vec3.push_back(npc1);
-            vec3.push_back(npc2);
-            vec3.push_back(npc3);
-            vec3.push_back(sniper4);
+            vec4.push_back(sniper2);
+            vec4.push_back(npc2);
+            vec4.push_back(npc3);
+            vec4.push_back(sniper4);
             //diff 5
+            vec5.push_back(npc1);
             //diff 6
+            vec6.push_back(npc1);
             //diff 7
+            vec7.push_back(npc1);
             //diff 8
+            vec8.push_back(npc1);
             //diff 9
+            vec9.push_back(npc1);
             //diff 10
+            vec10.push_back(npc1);
 
             enemiesByDifficulty[1] = vec1;
             enemiesByDifficulty[2] = vec2;

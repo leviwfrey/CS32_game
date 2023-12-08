@@ -14,7 +14,7 @@ using namespace std;
 //Global Constants
 int const SCREEN_WIDTH = 1400;
 int const SCREEN_HEIGHT = 1400;
-size_t const MAX_DIFFICULTY = 3;
+size_t const MAX_DIFFICULTY = 2;
 
 enum GameState {
     START_SCREEN,
@@ -61,7 +61,7 @@ void spawnEnemies(size_t _difficulty){
 
 void drawEndScreen(){
     
-    drawText(1.0, 1.0, 1.0, -200, 250, "GAME OVER");
+    drawText(1.0, 1.0, 1.0, -200, 250, "YOU DIED");
     drawText(1.0, 1.0, 1.0, -200, 200, "Press k to play again");
     drawText(1.0, 1.0, 1.0, -200, 150, "Top 5 Attempts By Difficulty Reached:");
     int originaly = 100;
