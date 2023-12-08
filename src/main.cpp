@@ -14,7 +14,7 @@ using namespace std;
 //Global Constants
 int const SCREEN_WIDTH = 1400;
 int const SCREEN_HEIGHT = 1400;
-size_t const MAX_DIFFICULTY = 3;
+size_t const MAX_DIFFICULTY = 10;
 
 enum GameState {
     START_SCREEN,
@@ -51,7 +51,7 @@ void removeDuplicatesAndSort(std::vector<size_t>& arr) {
 void spawnEnemies(size_t _difficulty){
     if(gameState == GAME_SCREEN){
     
-        Difficulty diff = Difficulty(player);
+        Difficulty diff = Difficulty(player, entityHandler);
         vector<shared_ptr<Entity>> enemies = diff.getEnemiesByDifficulty(_difficulty);
         for(shared_ptr<Entity> npc : enemies){
             entityHandler->addEntity(npc, "Enemies");
@@ -59,17 +59,18 @@ void spawnEnemies(size_t _difficulty){
     }
 }
 
-void drawEndScreen(){
+void drawEndScreen(size_t score){
     
-    drawText(1.0, 1.0, 1.0, 300, 250, "GAME OVER");
-    drawText(1.0, 1.0, 1.0, 300, 200, "Press k to play again");
-    drawText(1.0, 1.0, 1.0, 300, 150, "Top 5 Attempts By Difficulty Reached:");
+    drawText(1.0, 1.0, 1.0, -200, 300, "YOU DIED");
+    drawText(1.0, 1.0, 1.0, -200, 250, "Press k to play again");
+    drawText(1.0, 1.0, 1.0, -200, 200, "Difficulty on Death: " + to_string(score - 1));
+    drawText(1.0, 1.0, 1.0, -200, 150, "Top 5 Attempts By Difficulty Reached:");
     int originaly = 100;
     removeDuplicatesAndSort(highscores); //sorts in ascending order
     std::reverse(highscores.begin(), highscores.end()); //now in descending order
     int numScores = 0;
     for(size_t score: highscores){
-        drawText(1.0, 1.0, 1.0, 300, originaly, to_string(score));
+        drawText(1.0, 1.0, 1.0, -200, originaly, to_string(score));
         originaly -= 50; numScores++;
         if(numScores >= 5){break;}
     }
@@ -77,13 +78,19 @@ void drawEndScreen(){
 
 
 void display() {
-    glClear(GL_COLOR_BUFFER_BIT);    
+    glClear(GL_COLOR_BUFFER_BIT);
+    if(gameState == START_SCREEN){
+        drawText(1.0, 1.0, 1.0, -200, 600, "WELCOME: press w to begin");
+        drawText(1.0, 1.0, 1.0, -200, 550, "use WASD to move, and spacebar to shoot");
+        drawText(1.0, 1.0, 1.0, -200, 500, "don't get shot or collide with an enemy!");
+        drawText(1.0, 1.0, 1.0, -200, 450, "you may not move outside the game window");
+    }
     if (gameState == GAME_SCREEN) {
         string text2 = "Difficulty: " + std::to_string(difficulty);
-        drawText(1.0, 1.0, 1.0, 500, 450, text2);
+        drawText(1.0, 1.0, 1.0, 0, 600, text2);
         entityHandler->drawAll();
     } else if(gameState == END_SCREEN) {
-        drawEndScreen();
+        drawEndScreen(difficulty);
     }
     glutSwapBuffers();  // swaps the canvas with the current screen
 }
@@ -100,7 +107,8 @@ void handleKeyPress(unsigned char key, int x, int y) {
         player = make_shared<Player>(entityHandler);
         entityHandler->addEntity(player, "Players");
         spawnEnemies(difficulty);
-
+    } else if (gameState == START_SCREEN && key == 'w'){
+        gameState = GAME_SCREEN;
     }
 }
 
@@ -145,10 +153,11 @@ void update(int value) {
             difficulty++;
             if(difficulty > MAX_DIFFICULTY){
               gameState = END_SCREEN;
-              difficulty--;
-              highscores.push_back(difficulty);
-              drawEndScreen();return;}
-              spawnEnemies(difficulty);
+              highscores.push_back(difficulty - 1);
+              //drawEndScreen();
+              return;
+            }
+            spawnEnemies(difficulty);
           }
     } else {
         entityHandler->print();
@@ -162,13 +171,13 @@ void update(int value) {
 int main(int argc, char** argv) {
 
     // Initiation:
-    gameState = GAME_SCREEN;
     glutInit(&argc, argv);                          // Intiates screen?
     glutInitDisplayMode(GLUT_SINGLE);               //You need to do once ig
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT); //sets the size, might be pixel by pixel
     glutCreateWindow("Funny little square!!"); 
     reshape(SCREEN_WIDTH, SCREEN_HEIGHT);
     
+    gameState = START_SCREEN;
     // Game Loop:
     glutDisplayFunc(display); // function that paints everything on the screen
     glutTimerFunc(25, update, 0); // function that should do all the logic for entities
