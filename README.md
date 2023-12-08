@@ -16,7 +16,7 @@ to kill the current instance use the top right corner of the game window or in t
 
 use WASD controls to move around the screen
 
-use the spacebar to shoot a projectile
+use the spacebar and mouse to shoot a projectile
 
 avoid colliding with an enemy or being shot to survive
 
