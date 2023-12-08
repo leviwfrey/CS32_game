@@ -59,10 +59,11 @@ void spawnEnemies(size_t _difficulty){
     }
 }
 
-void drawEndScreen(){
+void drawEndScreen(size_t score){
     
-    drawText(1.0, 1.0, 1.0, -200, 250, "YOU DIED");
-    drawText(1.0, 1.0, 1.0, -200, 200, "Press k to play again");
+    drawText(1.0, 1.0, 1.0, -200, 300, "YOU DIED");
+    drawText(1.0, 1.0, 1.0, -200, 250, "Press k to play again");
+    drawText(1.0, 1.0, 1.0, -200, 200, "Difficulty on Death: " + to_string(score - 1));
     drawText(1.0, 1.0, 1.0, -200, 150, "Top 5 Attempts By Difficulty Reached:");
     int originaly = 100;
     removeDuplicatesAndSort(highscores); //sorts in ascending order
@@ -83,7 +84,7 @@ void display() {
         drawText(1.0, 1.0, 1.0, 0, 600, text2);
         entityHandler->drawAll();
     } else if(gameState == END_SCREEN) {
-        drawEndScreen();
+        drawEndScreen(difficulty);
     }
     glutSwapBuffers();  // swaps the canvas with the current screen
 }
