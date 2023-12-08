@@ -79,6 +79,10 @@ void Player::update() {
         weapon->shoot(newPos, rot, entityHandler, "Projectiles");
     }
 
+    if(abs(pos.x) > 740 || abs(pos.y) > 740){
+        isAlive = false;
+    }
+
 }
 
 void Player::handleCollision(shared_ptr<Entity> entity) {
