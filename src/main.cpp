@@ -147,7 +147,9 @@ void update(int value) {
               gameState = END_SCREEN;
               difficulty--;
               highscores.push_back(difficulty);
-              drawEndScreen();return;}
+              drawEndScreen();
+              return;
+            }
               spawnEnemies(difficulty);
           }
     } else {

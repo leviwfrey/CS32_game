@@ -20,10 +20,10 @@ class Difficulty {
         Difficulty(shared_ptr<Player> _player){
             player = _player;
             
-            //set various types of enemies
-            shared_ptr<Npc> enemy1 = make_shared<Npc>(Vector2d(-300, 300), 70, player);
-            shared_ptr<Npc> enemy2 = make_shared<Npc>(Vector2d(-300, -300), 70, player);
-            shared_ptr<Npc> enemy3 = make_shared<Npc>(Vector2d(300, 300), 70, player);
+            //set various types of enemies (800 is approximately outside the play area)
+            shared_ptr<Npc> enemy1 = make_shared<Npc>(Vector2d(-800, 300), 70, player);
+            shared_ptr<Npc> enemy2 = make_shared<Npc>(Vector2d(-300, -800), 70, player);
+            shared_ptr<Npc> enemy3 = make_shared<Npc>(Vector2d(800, 800), 70, player);
 
             //diff 1
             vec1.push_back(enemy1);
