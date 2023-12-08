@@ -21,23 +21,25 @@ class Difficulty {
             player = _player;
             
             //set various types of enemies (800 is approximately outside the play area)
-            shared_ptr<Npc> npc1 = make_shared<Npc>(Vector2d(-800, 500), 70, _player);
-            shared_ptr<Npc> npc2 = make_shared<Npc>(Vector2d(-800, -500), 70, _player);
-            shared_ptr<Npc> npc3 = make_shared<Npc>(Vector2d(-600, -800), 70, _player);
-            shared_ptr<Npc> npc4 = make_shared<Npc>(Vector2d(-500, -800), 70, _player);
-            shared_ptr<Npc> npc5 = make_shared<Npc>(Vector2d(500, -800), 70, _player);
-            shared_ptr<Npc> npc6 = make_shared<Npc>(Vector2d(600, -800), 70, _player);
-            shared_ptr<Npc> npc7 = make_shared<Npc>(Vector2d(800, 500), 70, _player);
-            shared_ptr<Npc> npc8 = make_shared<Npc>(Vector2d(800, 600), 70, _player);
+            shared_ptr<Npc> npc1 = make_shared<Npc>(Vector2d(-800, 500), 70, _player, 4);
+            shared_ptr<Npc> fastnpc1 = make_shared<Npc>(Vector2d(-800, 500), 70, _player, 7);
+            shared_ptr<Npc> npc2 = make_shared<Npc>(Vector2d(-800, -500), 70, _player, 4);
+            shared_ptr<Npc> npc3 = make_shared<Npc>(Vector2d(-600, -800), 70, _player, 4);
+            shared_ptr<Npc> npc4 = make_shared<Npc>(Vector2d(-500, -800), 70, _player, 4);
+            shared_ptr<Npc> fastnpc4 = make_shared<Npc>(Vector2d(-500, -800), 70, _player, 7);
+            shared_ptr<Npc> npc5 = make_shared<Npc>(Vector2d(500, -800), 70, _player, 4);
+            shared_ptr<Npc> npc6 = make_shared<Npc>(Vector2d(600, -800), 70, _player, 4);
+            shared_ptr<Npc> npc7 = make_shared<Npc>(Vector2d(800, 500), 70, _player, 4);
+            shared_ptr<Npc> npc8 = make_shared<Npc>(Vector2d(800, 500), 70, _player, 4);
 
-            shared_ptr<SniperEnemy> sniper1 = make_shared<SniperEnemy>(Vector2d(600, 600), 70, _player, _entityHandler);
-            shared_ptr<SniperEnemy> sniper2 = make_shared<SniperEnemy>(Vector2d(-600, 600), 70, _player, _entityHandler);
-            shared_ptr<SniperEnemy> sniper3 = make_shared<SniperEnemy>(Vector2d(-600, -600), 70, _player, _entityHandler);
-            shared_ptr<SniperEnemy> sniper4 = make_shared<SniperEnemy>(Vector2d(600, -600), 70, _player, _entityHandler);
+            shared_ptr<SniperEnemy> sniper1 = make_shared<SniperEnemy>(Vector2d(700, 700), 70, _player, _entityHandler);
+            shared_ptr<SniperEnemy> sniper2 = make_shared<SniperEnemy>(Vector2d(-700, 700), 70, _player, _entityHandler);
+            shared_ptr<SniperEnemy> sniper3 = make_shared<SniperEnemy>(Vector2d(-700, -700), 70, _player, _entityHandler);
+            shared_ptr<SniperEnemy> sniper4 = make_shared<SniperEnemy>(Vector2d(700, -700), 70, _player, _entityHandler);
             
 
             //diff 1
-            vec1.push_back(npc1);
+            vec1.push_back(npc1);    
             //diff 2
             vec2.push_back(sniper1);
             //diff 3
@@ -48,19 +50,43 @@ class Difficulty {
             vec4.push_back(sniper2);
             vec4.push_back(npc2);
             vec4.push_back(npc3);
-            vec4.push_back(sniper4);
             //diff 5
-            vec5.push_back(npc1);
+            vec5.push_back(npc2);
+            vec5.push_back(npc4);
+            vec5.push_back(sniper4);
+            vec5.push_back(npc8);
             //diff 6
             vec6.push_back(npc1);
+            vec6.push_back(npc3);
+            vec6.push_back(npc5);
+            vec6.push_back(npc7);
+            vec6.push_back(sniper2);
+
             //diff 7
-            vec7.push_back(npc1);
+            vec7.push_back(fastnpc1);
+
             //diff 8
-            vec8.push_back(npc1);
+            vec8.push_back(fastnpc1);
+            vec8.push_back(npc5);
+            vec8.push_back(npc7);
+
             //diff 9
-            vec9.push_back(npc1);
+            vec9.push_back(fastnpc4);
+            vec9.push_back(npc3);
+            vec9.push_back(npc5);
+            vec9.push_back(npc7);
+            vec9.push_back(sniper2);
+
             //diff 10
+            vec10.push_back(fastnpc4);
             vec10.push_back(npc1);
+            vec10.push_back(npc3);
+            vec10.push_back(npc5);
+            vec10.push_back(npc7);
+            vec10.push_back(sniper2);
+            vec10.push_back(sniper4);
+            vec10.push_back(sniper1);
+            vec10.push_back(sniper3);
 
             enemiesByDifficulty[1] = vec1;
             enemiesByDifficulty[2] = vec2;

@@ -89,12 +89,13 @@ void Player::handleCollision(shared_ptr<Entity> entity) {
 
 // NPC
 
-Npc::Npc(Vector2d position, double size, shared_ptr<Player> _player) {
+Npc::Npc(Vector2d position, double size, shared_ptr<Player> _player, double _speed) {
     this->pos = position;
     this->size = size;
     this->collider = Collider(size * 0.707, pos); //parameter sets the size of the hitbox
     this->rot = 0;
     this->group = "Enemies";
+    this->speed = _speed;
 
     Vector2d p1 = Vector2d(-size/2, size/2);
     Vector2d p2 = Vector2d(size/2, size/2);

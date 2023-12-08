@@ -14,7 +14,7 @@ using namespace std;
 //Global Constants
 int const SCREEN_WIDTH = 1400;
 int const SCREEN_HEIGHT = 1400;
-size_t const MAX_DIFFICULTY = 2;
+size_t const MAX_DIFFICULTY = 10;
 
 enum GameState {
     START_SCREEN,
@@ -145,12 +145,11 @@ void update(int value) {
             difficulty++;
             if(difficulty > MAX_DIFFICULTY){
               gameState = END_SCREEN;
-              difficulty--;
-              highscores.push_back(difficulty);
-              drawEndScreen();
+              highscores.push_back(difficulty - 1);
+              //drawEndScreen();
               return;
             }
-              spawnEnemies(difficulty);
+            spawnEnemies(difficulty);
           }
     } else {
         entityHandler->print();

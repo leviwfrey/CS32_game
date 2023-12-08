@@ -57,7 +57,7 @@ class Shotgun : public Weapon {
         vector<Vector2d> model = {p1, p2, p3};
         double speed = 20;
         double damage = 2;
-        chrono::milliseconds cooldown = chrono::milliseconds(750);
+        chrono::milliseconds cooldown = chrono::milliseconds(250); //sets weapon cooldown
 };
 
 class Sniper : public Weapon {
@@ -145,7 +145,7 @@ class Player: public Entity {
 class Npc: public Entity {
 
     public:
-        Npc(Vector2d position, double size, shared_ptr<Player> _player);
+        Npc(Vector2d position, double size, shared_ptr<Player> _player, double speed);
 
         void draw();
         void update();
@@ -156,8 +156,8 @@ class Npc: public Entity {
 
         
     private:
-        double speed = 4;
-        double hp = 150;
+        double speed;
+        double hp = 50; //sets the hp
         shared_ptr<Player> player;
         Vector2d healthBarPos;
 
@@ -182,7 +182,7 @@ class SniperEnemy : public Entity {
         Vector2d healthBarPos;
         vector<Vector2d> model;
 
-        double range = 450;
+        double range = 750;
         double speed = 3;
         double hp = 50;
 };
