@@ -51,7 +51,7 @@ void removeDuplicatesAndSort(std::vector<size_t>& arr) {
 void spawnEnemies(size_t _difficulty){
     if(gameState == GAME_SCREEN){
     
-        Difficulty diff = Difficulty(player);
+        Difficulty diff = Difficulty(player, entityHandler);
         vector<shared_ptr<Entity>> enemies = diff.getEnemiesByDifficulty(_difficulty);
         for(shared_ptr<Entity> npc : enemies){
             entityHandler->addEntity(npc, "Enemies");
@@ -61,15 +61,15 @@ void spawnEnemies(size_t _difficulty){
 
 void drawEndScreen(){
     
-    drawText(1.0, 1.0, 1.0, 300, 250, "GAME OVER");
-    drawText(1.0, 1.0, 1.0, 300, 200, "Press k to play again");
-    drawText(1.0, 1.0, 1.0, 300, 150, "Top 5 Attempts By Difficulty Reached:");
+    drawText(1.0, 1.0, 1.0, -200, 250, "GAME OVER");
+    drawText(1.0, 1.0, 1.0, -200, 200, "Press k to play again");
+    drawText(1.0, 1.0, 1.0, -200, 150, "Top 5 Attempts By Difficulty Reached:");
     int originaly = 100;
     removeDuplicatesAndSort(highscores); //sorts in ascending order
     std::reverse(highscores.begin(), highscores.end()); //now in descending order
     int numScores = 0;
     for(size_t score: highscores){
-        drawText(1.0, 1.0, 1.0, 300, originaly, to_string(score));
+        drawText(1.0, 1.0, 1.0, -200, originaly, to_string(score));
         originaly -= 50; numScores++;
         if(numScores >= 5){break;}
     }
@@ -80,7 +80,7 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT);    
     if (gameState == GAME_SCREEN) {
         string text2 = "Difficulty: " + std::to_string(difficulty);
-        drawText(1.0, 1.0, 1.0, 500, 450, text2);
+        drawText(1.0, 1.0, 1.0, 0, 600, text2);
         entityHandler->drawAll();
     } else if(gameState == END_SCREEN) {
         drawEndScreen();
