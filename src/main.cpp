@@ -78,7 +78,12 @@ void drawEndScreen(size_t score){
 
 
 void display() {
-    glClear(GL_COLOR_BUFFER_BIT);    
+    glClear(GL_COLOR_BUFFER_BIT);
+    if(gameState == START_SCREEN){
+        drawText(1.0, 1.0, 1.0, -200, 600, "WELCOME: press w to begin");
+        drawText(1.0, 1.0, 1.0, -200, 550, "use WASD to move, and spacebar to shoot");
+        drawText(1.0, 1.0, 1.0, -200, 500, "don't get shot or collide with an enemy!");
+    }
     if (gameState == GAME_SCREEN) {
         string text2 = "Difficulty: " + std::to_string(difficulty);
         drawText(1.0, 1.0, 1.0, 0, 600, text2);
@@ -101,7 +106,8 @@ void handleKeyPress(unsigned char key, int x, int y) {
         player = make_shared<Player>(entityHandler);
         entityHandler->addEntity(player, "Players");
         spawnEnemies(difficulty);
-
+    } else if (gameState == START_SCREEN && key == 'w'){
+        gameState = GAME_SCREEN;
     }
 }
 
@@ -164,13 +170,13 @@ void update(int value) {
 int main(int argc, char** argv) {
 
     // Initiation:
-    gameState = GAME_SCREEN;
     glutInit(&argc, argv);                          // Intiates screen?
     glutInitDisplayMode(GLUT_SINGLE);               //You need to do once ig
     glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT); //sets the size, might be pixel by pixel
     glutCreateWindow("Funny little square!!"); 
     reshape(SCREEN_WIDTH, SCREEN_HEIGHT);
     
+    gameState = START_SCREEN;
     // Game Loop:
     glutDisplayFunc(display); // function that paints everything on the screen
     glutTimerFunc(25, update, 0); // function that should do all the logic for entities
