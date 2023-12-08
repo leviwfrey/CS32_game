@@ -83,6 +83,7 @@ void display() {
         drawText(1.0, 1.0, 1.0, -200, 600, "WELCOME: press w to begin");
         drawText(1.0, 1.0, 1.0, -200, 550, "use WASD to move, and spacebar to shoot");
         drawText(1.0, 1.0, 1.0, -200, 500, "don't get shot or collide with an enemy!");
+        drawText(1.0, 1.0, 1.0, -200, 450, "you may not move outside the game window");
     }
     if (gameState == GAME_SCREEN) {
         string text2 = "Difficulty: " + std::to_string(difficulty);
